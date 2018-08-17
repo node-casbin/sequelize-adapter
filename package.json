@@ -1,0 +1,89 @@
+{
+  "name": "casbin-sequelize-adapter",
+  "version": "1.0.0",
+  "description": "Sequelize adapter for Node-Casbin",
+  "main": "lib/adapter.js",
+  "typings": "lib/adapter.d.ts",
+  "scripts": {
+    "precommit": "lint-staged",
+    "prepublish": "yarn run lint && yarn run test && yarn build",
+    "build": "rimraf lib && tsc",
+    "lint": "tslint \"src/**/*.ts\"",
+    "fix": "tslint \"src/**/*.ts\" --fix",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.1",
+    "@types/lodash": "^4.14.113",
+    "@types/node": "^10.5.3",
+    "husky": "^0.14.3",
+    "jest": "^23.4.2",
+    "lint-staged": "^7.2.0",
+    "rimraf": "^2.6.2",
+    "ts-jest": "22.4.6",
+    "tslint": "^5.11.0",
+    "typescript": "^2.9.2",
+    "coveralls": "^3.0.2"
+  },
+  "dependencies": {
+    "casbin": "^1.1.0",
+    "sequelize": "^4.38.0",
+    "lodash": "^4.17.10"
+  },
+  "files": [
+    "lib",
+    "examples"
+  ],
+  "homepage": "https://casbin.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/node-casbin/casbin-sequelize-adapter.git"
+  },
+  "keywords": [
+    "casbin",
+    "node-casbin",
+    "adapter",
+    "sequelize",
+    "access-control",
+    "authorization",
+    "auth",
+    "authz",
+    "acl",
+    "rbac",
+    "abac",
+    "orm"
+  ],
+  "author": "Node-Casbin",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/node-casbin/sequelize-adapter/issues"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "tslint --fix",
+      "git add"
+    ]
+  },
+  "jest": {
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "testMatch": [
+      "**/test/*.+(ts|tsx)"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+}

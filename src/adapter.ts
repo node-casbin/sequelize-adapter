@@ -15,15 +15,15 @@
 import { Helper, Model } from 'casbin';
 import { Sequelize } from 'sequelize';
 
-class CasbinRule {
-    public ptype: string;
-    public v0: string;
-    public v1: string;
-    public v2: string;
-    public v3: string;
-    public v4: string;
-    public v5: string;
-}
+const CasbinRule = Sequelize.define('casbin_rule', {
+    ptype: Sequelize.STRING,
+    v0: Sequelize.STRING,
+    v1: Sequelize.STRING,
+    v2: Sequelize.STRING,
+    v3: Sequelize.STRING,
+    v4: Sequelize.STRING,
+    v5: Sequelize.STRING
+});
 
 export class Adapter {
     private connStr: string;
@@ -50,13 +50,12 @@ export class Adapter {
     }
 
     private createTable() {
-
     }
 
     private dropTable() {
     }
 
-    private loadPolicyLine(line: CasbinRule, model: Model) {
+    private loadPolicyLine(line: {[index: string]: string}, model: Model) {
         let lineText = line.ptype;
         if (line.v0 !== '') {
             lineText += ', ' + line.v0;
@@ -84,10 +83,14 @@ export class Adapter {
      * loadPolicy loads all policy rules from the storage.
      */
     public loadPolicy(model: Model) {
+        const lines = CasbinRule.findAll();
 
+        for (const line of lines) {
+            this.loadPolicyLine(line.toJSON(), model);
+        }
     }
 
-    private savePolicyLine(ptype: string, rule: string[]): CasbinRule {
+    private savePolicyLine(ptype: string, rule: string[]): {[index: string]: string} {
         const line = new CasbinRule();
 
         line.ptype = ptype;
@@ -117,7 +120,27 @@ export class Adapter {
      * savePolicy saves all policy rules to the storage.
      */
     public savePolicy(model: Model) {
+        this.dropTable();
+        this.createTable();
 
+        const lines = [];
+        let astMap = model.get('p');
+        for (const [ptype, ast] of astMap) {
+            for (const rule of ast.Policy) {
+                const line = this.savePolicyLine(ptype, rule);
+                lines.push(line);
+            }
+        }
+
+        astMap = model.get('g');
+        for (const [ptype, ast] of astMap) {
+            for (const rule of ast.Policy) {
+                const line = this.savePolicyLine(ptype, rule);
+                lines.push(line);
+            }
+        }
+
+        CasbinRule.bulkCreate(lines);
     }
 
     /**

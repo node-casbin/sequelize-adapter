@@ -147,6 +147,7 @@ export class SequelizeAdapter {
         await this.createTable();
 
         let astMap = model.model.get('p');
+        // @ts-ignore
         for (const [ptype, ast] of astMap) {
             for (const rule of ast.policy) {
                 const line = this.savePolicyLine(ptype, rule);
@@ -155,6 +156,7 @@ export class SequelizeAdapter {
         }
 
         astMap = model.model.get('g');
+        // @ts-ignore
         for (const [ptype, ast] of astMap) {
             for (const rule of ast.policy) {
                 const line = this.savePolicyLine(ptype, rule);

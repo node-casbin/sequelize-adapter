@@ -1,4 +1,4 @@
-Sequelize Adapter
+Sequelize Adapter [![Build Status](https://travis-ci.org/node-casbin/sequelize-adapter.svg?branch=master)](https://travis-ci.org/node-casbin/sequelize-adapter) [![Coverage Status](https://coveralls.io/repos/github/node-casbin/sequelize-adapter/badge.svg?branch=master)](https://coveralls.io/github/node-casbin/sequelize-adapter?branch=master)
 ====
 
 Sequelize Adapter is the [Sequelize](https://github.com/sequelize/sequelize) adapter for [Node-Casbin](https://github.com/casbin/node-casbin). With this library, Node-Casbin can load policy from Sequelize supported database or save policy to it.

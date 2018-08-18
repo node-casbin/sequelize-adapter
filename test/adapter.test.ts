@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as _ from 'lodash';
 import { Enforcer, Util } from 'casbin';
 import { Adapter } from '../src/index';
+
+function array2DEquals(a: string[][], b: string[][]): boolean {
+    return _.isEqual(a, b);
+}
 
 function testGetPolicy(e: Enforcer, res: string[][]) {
     const myRes = e.getPolicy();
     Util.logPrint('Policy: ' + myRes);
 
-    expect(Util.array2DEquals(res, myRes)).toBe(true);
+    expect(array2DEquals(res.sort(), myRes.sort())).toBe(true);
 }
 
 test('TestAdapter', async () => {
@@ -27,19 +32,19 @@ test('TestAdapter', async () => {
     // so we need to load the policy from the file adapter (.CSV) first.
     let e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
 
-    let a = new Adapter('mysql://root:123@localhost:3306/casbin', {});
+    let a = new Adapter('mysql://root:123456@localhost:3306/casbin', {});
     await a.init();
     // This is a trick to save the current policy to the DB.
     // We can't call e.savePolicy() because the adapter in the enforcer is still the file adapter.
     // The current policy means the policy in the Node-Casbin enforcer (aka in memory).
-    a.savePolicy(e.getModel());
+    await a.savePolicy(e.getModel());
 
     // Clear the current policy.
-    e.clearPolicy();
+    await e.clearPolicy();
     testGetPolicy(e, []);
 
     // Load the policy from DB.
-    a.loadPolicy(e.getModel());
+    await a.loadPolicy(e.getModel());
     testGetPolicy(e, [
         ['alice', 'data1', 'read'],
         ['bob', 'data2', 'write'],
@@ -52,7 +57,7 @@ test('TestAdapter', async () => {
     // Now the DB has policy, so we can provide a normal use case.
     // Create an adapter and an enforcer.
     // newEnforcer() will load the policy automatically.
-    a = new Adapter('mysql://root:123@localhost:3306/casbin', {});
+    a = new Adapter('mysql://root:123456@localhost:3306/casbin', {});
     await a.init();
     e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
     testGetPolicy(e, [

@@ -27,7 +27,7 @@ test('TestAdapter', async () => {
     // so we need to load the policy from the file adapter (.CSV) first.
     let e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
 
-    let a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/casbin');
+    let a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/');
     // This is a trick to save the current policy to the DB.
     // We can't call e.savePolicy() because the adapter in the enforcer is still the file adapter.
     // The current policy means the policy in the Node-Casbin enforcer (aka in memory).
@@ -53,7 +53,7 @@ test('TestAdapter', async () => {
     // Now the DB has policy, so we can provide a normal use case.
     // Create an adapter and an enforcer.
     // newEnforcer() will load the policy automatically.
-    a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/casbin');
+    a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/');
     e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
     testGetPolicy(e, [
         ['alice', 'data1', 'read'],

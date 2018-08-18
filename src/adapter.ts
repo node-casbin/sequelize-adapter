@@ -21,25 +21,45 @@ import {CasbinRule} from './casbinRule';
  */
 export class SequelizeAdapter {
     private connStr: string;
+    private dbSpecified: boolean;
+
     private sequelize: Sequelize;
 
     /**
      * newAdapter is the constructor.
+     * dbSpecified is an optional boolean parameter. The default value is false.
+     * It's up to whether you have specified an existing DB in connStr.
+     * If dbSpecified == true, you need to make sure the DB in connStr exists.
+     * If dbSpecified == false, the adapter will automatically create a DB named 'casbin'.
      */
-    public static async newAdapter(connStr: string) {
+    public static async newAdapter(connStr: string, dbSpecified: boolean = false) {
         const a = new SequelizeAdapter();
         a.connStr = connStr;
+        a.dbSpecified = dbSpecified;
 
         await a.open();
 
         return a;
     }
 
-    private createDatabase() {
+    private async createDatabase() {
+        this.sequelize = new Sequelize(this.connStr);
+        await this.sequelize.authenticate();
+
+        await this.sequelize.query('CREATE DATABASE IF NOT EXISTS casbin');
+
+        await this.sequelize.close();
     }
 
     private async open() {
-        this.sequelize = new Sequelize(this.connStr);
+        if (this.dbSpecified) {
+            this.sequelize = new Sequelize(this.connStr);
+        } else {
+            await this.createDatabase();
+
+            this.sequelize = new Sequelize(this.connStr + 'casbin');
+        }
+
         await this.sequelize.authenticate();
         this.sequelize.addModels([CasbinRule]);
 

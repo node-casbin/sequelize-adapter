@@ -7,7 +7,9 @@
     "declarationDir": "lib",
     "strict": true,
     "outDir": "lib",
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*.ts"]
 }

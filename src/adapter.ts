@@ -12,18 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Helper, Model } from 'casbin';
-import { Sequelize } from 'sequelize';
-
-const CasbinRule = Sequelize.define('casbin_rule', {
-    ptype: Sequelize.STRING,
-    v0: Sequelize.STRING,
-    v1: Sequelize.STRING,
-    v2: Sequelize.STRING,
-    v3: Sequelize.STRING,
-    v4: Sequelize.STRING,
-    v5: Sequelize.STRING
-});
+import {Helper, Model} from 'casbin';
+import {Sequelize} from 'sequelize-typescript';
+import {CasbinRule} from './casbinRule';
 
 export class Adapter {
     private connStr: string;
@@ -33,7 +24,7 @@ export class Adapter {
     constructor(connStr: string) {
         this.connStr = connStr;
 
-        open();
+        this.open();
     }
 
     private createDatabase() {
@@ -41,6 +32,7 @@ export class Adapter {
 
     private open() {
         this.sequelize = new Sequelize(this.connStr);
+        this.sequelize.addModels([CasbinRule]);
 
         this.createTable();
     }
@@ -90,7 +82,7 @@ export class Adapter {
         }
     }
 
-    private savePolicyLine(ptype: string, rule: string[]): {[index: string]: string} {
+    private savePolicyLine(ptype: string, rule: string[]): CasbinRule {
         const line = new CasbinRule();
 
         line.ptype = ptype;

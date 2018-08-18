@@ -67,7 +67,12 @@ const CasbinRule = (sequalize: Sequelize.Sequelize) => {
       allowNull: true
     }
   };
-  return sequalize.define<CasbinRuleInstance, CasbinRuleAttributes>('CasbinRule', attributes);
+  const options = {
+    timestamps: false,
+    underscored: true,
+    tableName: 'casbin_rule'
+  };
+  return sequalize.define<CasbinRuleInstance, CasbinRuleAttributes>('CasbinRule', attributes, options);
 };
 
 export { CasbinRuleAttributes, CasbinRuleInstance, CasbinRule };

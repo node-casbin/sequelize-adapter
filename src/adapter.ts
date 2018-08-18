@@ -16,55 +16,66 @@ import {Helper, Model} from 'casbin';
 import {Sequelize} from 'sequelize-typescript';
 import {CasbinRule} from './casbinRule';
 
-export class Adapter {
+/**
+ * SequelizeAdapter represents the Sequelize adapter for policy storage.
+ */
+export class SequelizeAdapter {
     private connStr: string;
-
     private sequelize: Sequelize;
 
-    constructor(connStr: string) {
-        this.connStr = connStr;
+    /**
+     * newAdapter is the constructor.
+     */
+    public static async newAdapter(connStr: string) {
+        const a = new SequelizeAdapter();
+        a.connStr = connStr;
 
-        this.open();
+        await a.open();
+
+        return a;
     }
 
     private createDatabase() {
     }
 
-    private open() {
+    private async open() {
         this.sequelize = new Sequelize(this.connStr);
+        await this.sequelize.authenticate();
         this.sequelize.addModels([CasbinRule]);
 
-        this.createTable();
+        await this.createTable();
     }
 
-    private close() {
-        this.sequelize.close();
+    public async close() {
+        await this.sequelize.close();
     }
 
-    private createTable() {
+    private async createTable() {
+        await CasbinRule.sync();
     }
 
-    private dropTable() {
+    private async dropTable() {
+        await CasbinRule.destroy({where: {}, truncate: true});
     }
 
-    private loadPolicyLine(line: {[index: string]: string}, model: Model) {
+    private loadPolicyLine(line: CasbinRule, model: Model) {
         let lineText = line.ptype;
-        if (line.v0 !== '') {
+        if (line.v0 !== null) {
             lineText += ', ' + line.v0;
         }
-        if (line.v1 !== '') {
+        if (line.v1 !== null) {
             lineText += ', ' + line.v1;
         }
-        if (line.v2 !== '') {
+        if (line.v2 !== null) {
             lineText += ', ' + line.v2;
         }
-        if (line.v3 !== '') {
+        if (line.v3 !== null) {
             lineText += ', ' + line.v3;
         }
-        if (line.v4 !== '') {
+        if (line.v4 !== null) {
             lineText += ', ' + line.v4;
         }
-        if (line.v5 !== '') {
+        if (line.v5 !== null) {
             lineText += ', ' + line.v5;
         }
 
@@ -74,11 +85,11 @@ export class Adapter {
     /**
      * loadPolicy loads all policy rules from the storage.
      */
-    public loadPolicy(model: Model) {
-        const lines = CasbinRule.findAll();
+    public async loadPolicy(model: Model) {
+        const lines = await CasbinRule.findAll();
 
         for (const line of lines) {
-            this.loadPolicyLine(line.toJSON(), model);
+            this.loadPolicyLine(line, model);
         }
     }
 
@@ -111,28 +122,25 @@ export class Adapter {
     /**
      * savePolicy saves all policy rules to the storage.
      */
-    public savePolicy(model: Model) {
-        this.dropTable();
-        this.createTable();
+    public async savePolicy(model: Model) {
+        await this.dropTable();
+        await this.createTable();
 
-        const lines = [];
-        let astMap = model.get('p');
+        let astMap = model.model.get('p');
         for (const [ptype, ast] of astMap) {
-            for (const rule of ast.Policy) {
+            for (const rule of ast.policy) {
                 const line = this.savePolicyLine(ptype, rule);
-                lines.push(line);
+                await line.save();
             }
         }
 
-        astMap = model.get('g');
+        astMap = model.model.get('g');
         for (const [ptype, ast] of astMap) {
-            for (const rule of ast.Policy) {
+            for (const rule of ast.policy) {
                 const line = this.savePolicyLine(ptype, rule);
-                lines.push(line);
+                await line.save();
             }
         }
-
-        CasbinRule.bulkCreate(lines);
     }
 
     /**

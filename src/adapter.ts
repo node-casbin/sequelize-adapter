@@ -25,9 +25,6 @@ export class SequelizeAdapter {
 
     private sequelize: Sequelize;
 
-    /**
-     * constructor is the constructor for SequelizeAdapter.
-     */
     constructor(connStr: string, dbSpecified: boolean) {
         this.connStr = connStr;
         this.dbSpecified = dbSpecified;
@@ -48,8 +45,7 @@ export class SequelizeAdapter {
     }
 
     private async createDatabase() {
-        const {connStr} = this;
-        const uriConfig: ISequelizeUriConfig = {url: connStr, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
+        const uriConfig: ISequelizeUriConfig = {url: this.connStr, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
         this.sequelize = new Sequelize(uriConfig);
         await this.sequelize.authenticate();
 
@@ -59,13 +55,12 @@ export class SequelizeAdapter {
     }
 
     private async open() {
-        const {connStr, dbSpecified} = this;
-        if (dbSpecified) {
-            const uriConfig: ISequelizeUriConfig = {url: connStr, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
+        if (this.dbSpecified) {
+            const uriConfig: ISequelizeUriConfig = {url: this.connStr, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
             this.sequelize = new Sequelize(uriConfig);
         } else {
             await this.createDatabase();
-            const url = connStr + 'casbin';
+            const url = this.connStr + 'casbin';
             const uriConfig: ISequelizeUriConfig = {url, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
             this.sequelize = new Sequelize(uriConfig);
         }

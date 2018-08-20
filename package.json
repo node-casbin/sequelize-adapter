@@ -28,7 +28,7 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "casbin": "^1.1.0",
+    "casbin": "^1.1.1",
     "lodash": "^4.17.10",
     "reflect-metadata": "^0.1.12",
     "sequelize": "^4.38.0",

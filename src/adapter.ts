@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Helper, Model} from 'casbin';
-import {Sequelize} from 'sequelize-typescript';
+import {Sequelize, ISequelizeUriConfig} from 'sequelize-typescript';
 import {CasbinRule} from './casbinRule';
 
 /**
@@ -26,6 +26,14 @@ export class SequelizeAdapter {
     private sequelize: Sequelize;
 
     /**
+     * constructor is the constructor for SequelizeAdapter.
+     */
+    constructor(connStr: string, dbSpecified: boolean) {
+        this.connStr = connStr;
+        this.dbSpecified = dbSpecified;
+    }
+
+    /**
      * newAdapter is the constructor.
      * dbSpecified is an optional boolean parameter. The default value is false.
      * It's up to whether you have specified an existing DB in connStr.
@@ -33,17 +41,16 @@ export class SequelizeAdapter {
      * If dbSpecified == false, the adapter will automatically create a DB named 'casbin'.
      */
     public static async newAdapter(connStr: string, dbSpecified: boolean = false) {
-        const a = new SequelizeAdapter();
-        a.connStr = connStr;
-        a.dbSpecified = dbSpecified;
-
+        const a = new SequelizeAdapter(connStr, dbSpecified);
         await a.open();
 
         return a;
     }
 
     private async createDatabase() {
-        this.sequelize = new Sequelize(this.connStr);
+        const {connStr} = this;
+        const uriConfig: ISequelizeUriConfig = {url: connStr, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
+        this.sequelize = new Sequelize(uriConfig);
         await this.sequelize.authenticate();
 
         await this.sequelize.query('CREATE DATABASE IF NOT EXISTS casbin');
@@ -52,12 +59,15 @@ export class SequelizeAdapter {
     }
 
     private async open() {
-        if (this.dbSpecified) {
-            this.sequelize = new Sequelize(this.connStr);
+        const {connStr, dbSpecified} = this;
+        if (dbSpecified) {
+            const uriConfig: ISequelizeUriConfig = {url: connStr, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
+            this.sequelize = new Sequelize(uriConfig);
         } else {
             await this.createDatabase();
-
-            this.sequelize = new Sequelize(this.connStr + 'casbin');
+            const url = connStr + 'casbin';
+            const uriConfig: ISequelizeUriConfig = {url, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
+            this.sequelize = new Sequelize(uriConfig);
         }
 
         await this.sequelize.authenticate();
@@ -80,22 +90,22 @@ export class SequelizeAdapter {
 
     private loadPolicyLine(line: CasbinRule, model: Model) {
         let lineText = line.ptype;
-        if (line.v0 !== null) {
+        if (line.v0) {
             lineText += ', ' + line.v0;
         }
-        if (line.v1 !== null) {
+        if (line.v1) {
             lineText += ', ' + line.v1;
         }
-        if (line.v2 !== null) {
+        if (line.v2) {
             lineText += ', ' + line.v2;
         }
-        if (line.v3 !== null) {
+        if (line.v3) {
             lineText += ', ' + line.v3;
         }
-        if (line.v4 !== null) {
+        if (line.v4) {
             lineText += ', ' + line.v4;
         }
-        if (line.v5 !== null) {
+        if (line.v5) {
             lineText += ', ' + line.v5;
         }
 
@@ -163,26 +173,28 @@ export class SequelizeAdapter {
                 await line.save();
             }
         }
+
+        return true;
     }
 
     /**
      * addPolicy adds a policy rule to the storage.
      */
-    public addPolicy(sec: string, ptype: string, rule: string[]) {
+    public async addPolicy(sec: string, ptype: string, rule: string[]) {
         throw new Error('not implemented');
     }
 
     /**
      * removePolicy removes a policy rule from the storage.
      */
-    public removePolicy(sec: string, ptype: string, rule: string[]) {
+    public async removePolicy(sec: string, ptype: string, rule: string[]) {
         throw new Error('not implemented');
     }
 
     /**
      * removeFilteredPolicy removes policy rules that match the filter from the storage.
      */
-    public removeFilteredPolicy(sec: string, ptype: string, rule: string[]) {
+    public async removeFilteredPolicy(sec: string, ptype: string, fieldIndex: number, ...fieldValues: string[]) {
         throw new Error('not implemented');
     }
 }

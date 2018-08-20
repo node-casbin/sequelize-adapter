@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Helper, Model} from 'casbin';
+import {Adapter, Helper, Model} from 'casbin';
 import {Sequelize, ISequelizeUriConfig} from 'sequelize-typescript';
 import {CasbinRule} from './casbinRule';
 
 /**
  * SequelizeAdapter represents the Sequelize adapter for policy storage.
  */
-export class SequelizeAdapter {
+export class SequelizeAdapter implements Adapter {
     private connStr: string;
     private dbSpecified: boolean;
 

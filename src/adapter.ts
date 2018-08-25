@@ -45,7 +45,11 @@ export class SequelizeAdapter implements Adapter {
     }
 
     private async createDatabase() {
-        const uriConfig: ISequelizeUriConfig = {url: this.connStr, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
+        const uriConfig: ISequelizeUriConfig = {
+            url: this.connStr,
+            logging: false,
+            pool: {max: 5, min: 0, idle: 10000}
+        };
         this.sequelize = new Sequelize(uriConfig);
         await this.sequelize.authenticate();
 
@@ -56,12 +60,20 @@ export class SequelizeAdapter implements Adapter {
 
     private async open() {
         if (this.dbSpecified) {
-            const uriConfig: ISequelizeUriConfig = {url: this.connStr, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
+            const uriConfig: ISequelizeUriConfig = {
+                url: this.connStr,
+                logging: false,
+                pool: {max: 5, min: 0, idle: 10000}
+            };
             this.sequelize = new Sequelize(uriConfig);
         } else {
             await this.createDatabase();
             const url = this.connStr + 'casbin';
-            const uriConfig: ISequelizeUriConfig = {url, logging: false, pool: { max: 5, min: 0, idle: 10000 }};
+            const uriConfig: ISequelizeUriConfig = {
+                url,
+                logging: false,
+                pool: {max: 5, min: 0, idle: 10000}
+            };
             this.sequelize = new Sequelize(uriConfig);
         }
 
@@ -84,27 +96,8 @@ export class SequelizeAdapter implements Adapter {
     }
 
     private loadPolicyLine(line: CasbinRule, model: Model) {
-        let lineText = line.ptype;
-        if (line.v0) {
-            lineText += ', ' + line.v0;
-        }
-        if (line.v1) {
-            lineText += ', ' + line.v1;
-        }
-        if (line.v2) {
-            lineText += ', ' + line.v2;
-        }
-        if (line.v3) {
-            lineText += ', ' + line.v3;
-        }
-        if (line.v4) {
-            lineText += ', ' + line.v4;
-        }
-        if (line.v5) {
-            lineText += ', ' + line.v5;
-        }
-
-        Helper.loadPolicyLine(lineText, model);
+        const result = line.ptype + ', ' + [line.v0, line.v1, line.v2, line.v3, line.v4, line.v5].filter(n => n).join(', ');
+        Helper.loadPolicyLine(result, model);
     }
 
     /**

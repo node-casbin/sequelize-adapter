@@ -23,43 +23,41 @@ function testGetPolicy(e: Enforcer, res: string[][]) {
 }
 
 test('TestAdapter', async () => {
-    // Because the DB is empty at first,
-    // so we need to load the policy from the file adapter (.CSV) first.
-    let e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
+    const a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/');
+    try {
+        // Because the DB is empty at first,
+        // so we need to load the policy from the file adapter (.CSV) first.
+        let e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
+        // This is a trick to save the current policy to the DB.
+        // We can't call e.savePolicy() because the adapter in the enforcer is still the file adapter.
+        // The current policy means the policy in the Node-Casbin enforcer (aka in memory).
+        await a.savePolicy(e.getModel());
 
-    let a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/');
-    // This is a trick to save the current policy to the DB.
-    // We can't call e.savePolicy() because the adapter in the enforcer is still the file adapter.
-    // The current policy means the policy in the Node-Casbin enforcer (aka in memory).
-    await a.savePolicy(e.getModel());
+        // Clear the current policy.
+        e.clearPolicy();
+        testGetPolicy(e, []);
 
-    // Clear the current policy.
-    e.clearPolicy();
-    testGetPolicy(e, []);
+        // Load the policy from DB.
+        await a.loadPolicy(e.getModel());
+        testGetPolicy(e, [
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write']]);
 
-    // Load the policy from DB.
-    await a.loadPolicy(e.getModel());
-    testGetPolicy(e, [
-        ['alice', 'data1', 'read'],
-        ['bob', 'data2', 'write'],
-        ['data2_admin', 'data2', 'read'],
-        ['data2_admin', 'data2', 'write']]);
+        // Note: you don't need to look at the above code
+        // if you already have a working DB with policy inside.
+        // Now the DB has policy, so we can provide a normal use case.
+        // Create an adapter and an enforcer.
+        // newEnforcer() will load the policy automatically.
+        e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
+        testGetPolicy(e, [
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write']]);
 
-    await a.close();
-
-    // Note: you don't need to look at the above code
-    // if you already have a working DB with policy inside.
-
-    // Now the DB has policy, so we can provide a normal use case.
-    // Create an adapter and an enforcer.
-    // newEnforcer() will load the policy automatically.
-    a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/');
-    e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
-    testGetPolicy(e, [
-        ['alice', 'data1', 'read'],
-        ['bob', 'data2', 'write'],
-        ['data2_admin', 'data2', 'read'],
-        ['data2_admin', 'data2', 'write']]);
-
-    await a.close();
+    } finally {
+        a.close();
+    }
 });

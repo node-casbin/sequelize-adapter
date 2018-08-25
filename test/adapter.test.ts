@@ -28,6 +28,7 @@ test('TestAdapter', async () => {
         // Because the DB is empty at first,
         // so we need to load the policy from the file adapter (.CSV) first.
         let e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
+
         // This is a trick to save the current policy to the DB.
         // We can't call e.savePolicy() because the adapter in the enforcer is still the file adapter.
         // The current policy means the policy in the Node-Casbin enforcer (aka in memory).
@@ -47,6 +48,7 @@ test('TestAdapter', async () => {
 
         // Note: you don't need to look at the above code
         // if you already have a working DB with policy inside.
+
         // Now the DB has policy, so we can provide a normal use case.
         // Create an adapter and an enforcer.
         // newEnforcer() will load the policy automatically.
@@ -56,7 +58,6 @@ test('TestAdapter', async () => {
             ['bob', 'data2', 'write'],
             ['data2_admin', 'data2', 'read'],
             ['data2_admin', 'data2', 'write']]);
-
     } finally {
         a.close();
     }

@@ -17,7 +17,7 @@ import {SequelizeAdapter} from '../src/adapter';
 
 function testGetPolicy(e: Enforcer, res: string[][]) {
     const myRes = e.getPolicy();
-    Util.logPrint('Policy: ' + myRes);
+    console.log('Policy: ', myRes);
 
     expect(Util.array2DEquals(res, myRes)).toBe(true);
 }

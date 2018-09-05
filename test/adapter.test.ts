@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Sequelize} from 'sequelize-typescript';
 import {Enforcer, Util} from 'casbin';
 import {SequelizeAdapter} from '../src/adapter';
 
@@ -23,7 +24,7 @@ function testGetPolicy(e: Enforcer, res: string[][]) {
 }
 
 test('TestAdapter', async () => {
-    const a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/');
+    let a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/');
     try {
         // Because the DB is empty at first,
         // so we need to load the policy from the file adapter (.CSV) first.
@@ -52,6 +53,14 @@ test('TestAdapter', async () => {
         // Now the DB has policy, so we can provide a normal use case.
         // Create an adapter and an enforcer.
         // newEnforcer() will load the policy automatically.
+        const sequelize: Sequelize = new Sequelize({
+            url: 'mysql://root:@localhost:3306/casbin',
+            logging: false,
+            pool: {max: 5, min: 0, idle: 10000}
+        });
+        await a.close();
+        a = await SequelizeAdapter.newAdapter(sequelize, true);
+
         e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
         testGetPolicy(e, [
             ['alice', 'data1', 'read'],
@@ -59,6 +68,6 @@ test('TestAdapter', async () => {
             ['data2_admin', 'data2', 'read'],
             ['data2_admin', 'data2', 'write']]);
     } finally {
-        a.close();
+        await a.close();
     }
 });

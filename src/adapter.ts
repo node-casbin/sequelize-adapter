@@ -20,14 +20,11 @@ import {CasbinRule} from './casbinRule';
  * SequelizeAdapter represents the Sequelize adapter for policy storage.
  */
 export class SequelizeAdapter implements Adapter {
-    private connStr: string;
-    private dbSpecified: boolean;
-
     private sequelize: Sequelize;
 
-    constructor(connStr: string, dbSpecified: boolean) {
-        this.connStr = connStr;
-        this.dbSpecified = dbSpecified;
+    constructor(sequelize: Sequelize) {
+        this.sequelize = sequelize;
+        this.sequelize.addModels([CasbinRule]);
     }
 
     /**
@@ -37,49 +34,44 @@ export class SequelizeAdapter implements Adapter {
      * If dbSpecified == true, you need to make sure the DB in connStr exists.
      * If dbSpecified == false, the adapter will automatically create a DB named 'casbin'.
      */
-    public static async newAdapter(connStr: string, dbSpecified: boolean = false) {
-        const a = new SequelizeAdapter(connStr, dbSpecified);
+    public static async newAdapter(param: string | Sequelize, dbSpecified: boolean = false) {
+        let sequelize: Sequelize;
+        if (typeof param === 'string' && param !== '') {
+            const config: ISequelizeUriConfig = {
+                url: param,
+                logging: false,
+                pool: {max: 5, min: 0, idle: 10000}
+            };
+            sequelize = new Sequelize(config);
+            if (!dbSpecified) {
+                param += 'casbin';
+                sequelize = await SequelizeAdapter.createDatabase(sequelize, param);
+            }
+        } else if (param instanceof Sequelize && dbSpecified) {
+            sequelize = param;
+        } else {
+            throw new Error('Invalid params');
+        }
+        const a = new SequelizeAdapter(sequelize);
         await a.open();
 
         return a;
     }
 
-    private async createDatabase() {
+    private static async createDatabase(sequelize: Sequelize, param: string): Promise<Sequelize> {
+        await sequelize.authenticate();
+        await sequelize.query('CREATE DATABASE IF NOT EXISTS casbin');
+        await sequelize.close();
         const uriConfig: ISequelizeUriConfig = {
-            url: this.connStr,
+            url: param,
             logging: false,
             pool: {max: 5, min: 0, idle: 10000}
         };
-        this.sequelize = new Sequelize(uriConfig);
-        await this.sequelize.authenticate();
-
-        await this.sequelize.query('CREATE DATABASE IF NOT EXISTS casbin');
-
-        await this.sequelize.close();
+        return new Sequelize(uriConfig);
     }
 
     private async open() {
-        if (this.dbSpecified) {
-            const uriConfig: ISequelizeUriConfig = {
-                url: this.connStr,
-                logging: false,
-                pool: {max: 5, min: 0, idle: 10000}
-            };
-            this.sequelize = new Sequelize(uriConfig);
-        } else {
-            await this.createDatabase();
-            const url = this.connStr + 'casbin';
-            const uriConfig: ISequelizeUriConfig = {
-                url,
-                logging: false,
-                pool: {max: 5, min: 0, idle: 10000}
-            };
-            this.sequelize = new Sequelize(uriConfig);
-        }
-
         await this.sequelize.authenticate();
-        this.sequelize.addModels([CasbinRule]);
-
         await this.createTable();
     }
 

@@ -165,7 +165,6 @@ export class SequelizeAdapter implements Adapter {
 
         let origin_map: any = {};
 
-        origin_map['asd'] = 1;
         this.DatabaseToMap(origin, origin_map)
         let astMap = model.model.get('p');
         // @ts-ignore

@@ -137,28 +137,78 @@ export class SequelizeAdapter implements Adapter {
         return line;
     }
 
+    private DatabaseToMap(origin: Array<CasbinRule>, origin_map: any) {
+        let CasbinRule_obj = ['v0', 'v1', 'v2', 'v3', 'v4', 'v5'];
+        for (let i in origin) {
+            let origin_i:any = origin[i].dataValues;
+            let str = '';
+            for (let index of CasbinRule_obj) {
+                if (origin_i[index]) {
+                    str += origin_i[index];
+                }
+            }
+            origin_map[str] = i;
+        }
+    }
     /**
-     * savePolicy saves all policy rules to the storage.
+     * savePolicy sync all policy rules to the storage.
      */
     public async savePolicy(model: Model) {
-        await this.dropTable();
-        await this.createTable();
 
+        //update p
+        let origin = await CasbinRule.findAll({
+            where: {
+                ptype: "p"
+            }
+        });
+
+
+        let origin_map: any = {};
+
+        origin_map['asd'] = 1;
+        this.DatabaseToMap(origin, origin_map)
         let astMap = model.model.get('p');
         // @ts-ignore
         for (const [ptype, ast] of astMap) {
             for (const rule of ast.policy) {
-                const line = this.savePolicyLine(ptype, rule);
-                await line.save();
+                let str = rule.join('');
+                if (origin_map[str] != undefined) {
+                    delete origin_map[str];
+                } else {
+                    const line = this.savePolicyLine(ptype, rule);
+                    await line.save();
+                }
+            }
+            for (let i in origin_map) {
+                await origin[origin_map[i]].destroy();
             }
         }
 
+        //update g
+        origin = await CasbinRule.findAll({
+            where: {
+                ptype: "g"
+            }
+        });
+
+        origin_map = {};
+        this.DatabaseToMap(origin, origin_map)
         astMap = model.model.get('g');
-        // @ts-ignore
+        if (!astMap) {
+            return true;
+        }
         for (const [ptype, ast] of astMap) {
             for (const rule of ast.policy) {
-                const line = this.savePolicyLine(ptype, rule);
-                await line.save();
+                let str = rule.join('');
+                if (origin_map[str] != undefined) {
+                    delete origin_map[str];
+                } else {
+                    const line = this.savePolicyLine(ptype, rule);
+                    await line.save();
+                }
+            }
+            for (let i in origin_map) {
+                await origin[origin_map[i]].destroy();
             }
         }
 

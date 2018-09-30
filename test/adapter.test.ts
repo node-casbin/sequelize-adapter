@@ -58,7 +58,26 @@ test('TestAdapter', async () => {
             ['bob', 'data2', 'write'],
             ['data2_admin', 'data2', 'read'],
             ['data2_admin', 'data2', 'write']]);
+
+        // Add policy to DB
+        await a.addPolicy('', 'p', ['role', 'res', 'action']);
+        e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
+        testGetPolicy(e, [
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write'],
+            ['role', 'res', 'action']]);
+
+        // Remove policy from DB
+        await a.removePolicy('', 'p', ['role', 'res', 'action']);
+        e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
+        testGetPolicy(e, [
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write']]);
     } finally {
         a.close();
     }
-});
+}, 60 * 1000);

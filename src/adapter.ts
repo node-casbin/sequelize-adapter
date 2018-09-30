@@ -50,36 +50,31 @@ export class SequelizeAdapter implements Adapter {
             logging: false,
             pool: {max: 5, min: 0, idle: 10000}
         };
-        this.sequelize = new Sequelize(uriConfig);
-        await this.sequelize.authenticate();
+        const sequelize = new Sequelize(uriConfig);
+        await sequelize.authenticate();
 
-        await this.sequelize.query('CREATE DATABASE IF NOT EXISTS casbin');
+        await sequelize.query('CREATE DATABASE IF NOT EXISTS casbin');
 
-        await this.sequelize.close();
+        await sequelize.close();
     }
 
     private async open() {
-        if (this.dbSpecified) {
-            const uriConfig: ISequelizeUriConfig = {
-                url: this.connStr,
-                logging: false,
-                pool: {max: 5, min: 0, idle: 10000}
-            };
-            this.sequelize = new Sequelize(uriConfig);
-        } else {
+        let url = this.connStr;
+        if (!this.dbSpecified) {
+            url = this.connStr + 'casbin';
             await this.createDatabase();
-            const url = this.connStr + 'casbin';
-            const uriConfig: ISequelizeUriConfig = {
-                url,
-                logging: false,
-                pool: {max: 5, min: 0, idle: 10000}
-            };
-            this.sequelize = new Sequelize(uriConfig);
         }
 
-        await this.sequelize.authenticate();
-        this.sequelize.addModels([CasbinRule]);
+        const uriConfig: ISequelizeUriConfig = {
+            url,
+            logging: false,
+            pool: {max: 5, min: 0, idle: 10000}
+        };
 
+        this.sequelize = new Sequelize(uriConfig);
+        await this.sequelize.authenticate();
+
+        this.sequelize.addModels([CasbinRule]);
         await this.createTable();
     }
 
@@ -169,14 +164,25 @@ export class SequelizeAdapter implements Adapter {
      * addPolicy adds a policy rule to the storage.
      */
     public async addPolicy(sec: string, ptype: string, rule: string[]) {
-        throw new Error('not implemented');
+        const line = this.savePolicyLine(ptype, rule);
+        await line.save();
     }
 
     /**
      * removePolicy removes a policy rule from the storage.
      */
     public async removePolicy(sec: string, ptype: string, rule: string[]) {
-        throw new Error('not implemented');
+        const line = this.savePolicyLine(ptype, rule);
+        const where = {};
+        Object.keys(line.dataValues)
+            .filter(key => key !== 'id')
+            .forEach(key => {
+                // @ts-ignore
+                where[key] = line[key];
+            });
+
+        // @ts-ignore
+        await CasbinRule.destroy({where});
     }
 
     /**

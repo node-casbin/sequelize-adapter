@@ -16,6 +16,11 @@ import {Adapter, Helper, Model} from 'casbin';
 import {Sequelize, ISequelizeUriConfig} from 'sequelize-typescript';
 import {CasbinRule} from './casbinRule';
 
+function ModelFactory(model: typeof CasbinRule) {
+    return class extends model {
+    };
+}
+
 /**
  * SequelizeAdapter represents the Sequelize adapter for policy storage.
  */
@@ -24,6 +29,7 @@ export class SequelizeAdapter implements Adapter {
     private dbSpecified: boolean;
 
     private sequelize: Sequelize;
+    private static modelMap: Map<Sequelize, typeof CasbinRule> = new Map();
 
     constructor(connStr: string, dbSpecified: boolean) {
         this.connStr = connStr;
@@ -74,7 +80,10 @@ export class SequelizeAdapter implements Adapter {
         this.sequelize = new Sequelize(uriConfig);
         await this.sequelize.authenticate();
 
-        this.sequelize.addModels([CasbinRule]);
+        const Rule = ModelFactory(CasbinRule);
+        SequelizeAdapter.modelMap.set(this.sequelize, Rule);
+        this.sequelize.addModels([Rule]);
+
         await this.createTable();
     }
 
@@ -82,12 +91,17 @@ export class SequelizeAdapter implements Adapter {
         await this.sequelize.close();
     }
 
+    private getCasbinRuleModel(): typeof CasbinRule {
+        const model = SequelizeAdapter.modelMap.get(this.sequelize);
+        return !model ? CasbinRule : model;
+    }
+
     private async createTable() {
-        await CasbinRule.sync();
+        await this.getCasbinRuleModel().sync();
     }
 
     private async dropTable() {
-        await CasbinRule.destroy({where: {}, truncate: true});
+        await this.getCasbinRuleModel().destroy({where: {}, truncate: true});
     }
 
     private loadPolicyLine(line: CasbinRule, model: Model) {
@@ -99,7 +113,7 @@ export class SequelizeAdapter implements Adapter {
      * loadPolicy loads all policy rules from the storage.
      */
     public async loadPolicy(model: Model) {
-        const lines = await CasbinRule.findAll();
+        const lines = await this.getCasbinRuleModel().findAll();
 
         for (const line of lines) {
             this.loadPolicyLine(line, model);
@@ -107,7 +121,8 @@ export class SequelizeAdapter implements Adapter {
     }
 
     private savePolicyLine(ptype: string, rule: string[]): CasbinRule {
-        const line = new CasbinRule();
+        const Rule = this.getCasbinRuleModel();
+        const line = new Rule();
 
         line.ptype = ptype;
         if (rule.length > 0) {
@@ -182,7 +197,7 @@ export class SequelizeAdapter implements Adapter {
             });
 
         // @ts-ignore
-        await CasbinRule.destroy({where});
+        await this.getCasbinRuleModel().destroy({where});
     }
 
     /**

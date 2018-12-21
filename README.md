@@ -42,7 +42,7 @@ async function myFunction() {
     // Or you can use an existing DB "abc" like this:
     // The adapter will use the table named "casbin_rule".
     // If it doesn't exist, the adapter will create it automatically.
-    // const a = await SequelizeAdapter.newAdapter('mysql://root:123@localhost:3306/abc');
+    // const a = await SequelizeAdapter.newAdapter('mysql://root:123@localhost:3306/abc', true);
 
     const e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
 

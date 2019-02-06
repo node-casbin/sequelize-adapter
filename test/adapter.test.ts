@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Enforcer, Util} from 'casbin';
+import {newEnforcer, Enforcer, Util} from 'casbin';
 import {SequelizeAdapter} from '../src/adapter';
 
 function testGetPolicy(e: Enforcer, res: string[][]) {
@@ -27,7 +27,7 @@ test('TestAdapter', async () => {
     try {
         // Because the DB is empty at first,
         // so we need to load the policy from the file adapter (.CSV) first.
-        let e = await Enforcer.newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
+        let e = await newEnforcer('examples/rbac_model.conf', 'examples/rbac_policy.csv');
 
         // This is a trick to save the current policy to the DB.
         // We can't call e.savePolicy() because the adapter in the enforcer is still the file adapter.
@@ -52,7 +52,7 @@ test('TestAdapter', async () => {
         // Now the DB has policy, so we can provide a normal use case.
         // Create an adapter and an enforcer.
         // newEnforcer() will load the policy automatically.
-        e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
+        e = await newEnforcer('examples/rbac_model.conf', a);
         testGetPolicy(e, [
             ['alice', 'data1', 'read'],
             ['bob', 'data2', 'write'],
@@ -61,7 +61,7 @@ test('TestAdapter', async () => {
 
         // Add policy to DB
         await a.addPolicy('', 'p', ['role', 'res', 'action']);
-        e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
+        e = await newEnforcer('examples/rbac_model.conf', a);
         testGetPolicy(e, [
             ['alice', 'data1', 'read'],
             ['bob', 'data2', 'write'],
@@ -71,13 +71,13 @@ test('TestAdapter', async () => {
 
         // Remove policy from DB
         await a.removePolicy('', 'p', ['role', 'res', 'action']);
-        e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
+        e = await newEnforcer('examples/rbac_model.conf', a);
         testGetPolicy(e, [
             ['alice', 'data1', 'read'],
             ['bob', 'data2', 'write'],
             ['data2_admin', 'data2', 'read'],
             ['data2_admin', 'data2', 'write']]);
     } finally {
-        a.close();
+        await a.close();
     }
 }, 60 * 1000);

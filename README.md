@@ -25,7 +25,7 @@ You may find other 3rd-party supported DBs in Sequelize website or other places.
 
 ## Installation
 
-    npm install casbin-sequelize-adapter
+    npm install casbin-sequelize-adapter --save
 
 ## Simple Example
 

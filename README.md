@@ -30,7 +30,7 @@ You may find other 3rd-party supported DBs in Sequelize website or other places.
 ## Simple Example
 
 ```typescript
-import {Enforcer} from 'casbin';
+import casbin from 'casbin';
 import {SequelizeAdapter} from 'casbin-sequelize-adapter';
 
 async function myFunction() {
@@ -44,7 +44,7 @@ async function myFunction() {
     // If it doesn't exist, the adapter will create it automatically.
     // const a = await SequelizeAdapter.newAdapter('mysql://root:123@localhost:3306/abc', true);
 
-    const e = await Enforcer.newEnforcer('examples/rbac_model.conf', a);
+    const e = await casbin.newEnforcer('examples/rbac_model.conf', a);
 
     // Load the policy from DB.
     await e.loadPolicy();

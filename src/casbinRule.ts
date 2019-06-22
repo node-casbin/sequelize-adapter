@@ -14,7 +14,7 @@
 
 import {Table, Column, Model} from 'sequelize-typescript';
 
-@Table({tableName: 'casbin_rule'})
+@Table({tableName: 'casbin_rule', timestamps: false})
 export class CasbinRule extends Model<CasbinRule> {
     @Column
     public ptype: string;

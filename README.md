@@ -35,19 +35,17 @@ import {SequelizeAdapter} from 'casbin-sequelize-adapter';
 
 async function myFunction() {
     // Initialize a Sequelize adapter and use it in a Node-Casbin enforcer:
-    // The adapter will use the MySQL database named "casbin".
-    // If it doesn't exist, the adapter will create it automatically.
-    const a = await SequelizeAdapter.newAdapter('mysql://root:123@localhost:3306/'); // Your connection string. 
-
-    // Or you can use an existing DB "abc" like this:
-    // The adapter will use the table named "casbin_rule".
-    // If it doesn't exist, the adapter will create it automatically.
-    // const a = await SequelizeAdapter.newAdapter('mysql://root:123@localhost:3306/abc', true);
+    // The adapter can not automatically create database.
+    // But the adapter will automatically and use the table named "casbin_rule".    
+    // ORM should not create databases automatically.  
+    const a = await SequelizeAdapter.newAdapter({
+        username: 'root',
+        password: '',
+        database: 'casbin',
+        dialect: 'mysql'
+    });
 
     const e = await casbin.newEnforcer('examples/rbac_model.conf', a);
-
-    // Load the policy from DB.
-    await e.loadPolicy();
 
     // Check the permission.
     e.enforce('alice', 'data1', 'read');

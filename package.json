@@ -66,10 +66,13 @@
     "url": "https://github.com/node-casbin/sequelize-adapter/issues"
   },
   "lint-staged": {
-    "*.{ts,js}": [
+    "*.{ts}": [
       "tslint --fix",
       "git add"
     ]
+  },
+  "publishConfig": {
+    "registry": "https://registry.yarnpkg.com"
   },
   "jest": {
     "testURL": "http://localhost",

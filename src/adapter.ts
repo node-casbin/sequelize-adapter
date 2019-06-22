@@ -13,77 +13,35 @@
 // limitations under the License.
 
 import {Adapter, Helper, Model} from 'casbin';
-import {Sequelize, ISequelizeUriConfig} from 'sequelize-typescript';
+import {Sequelize, SequelizeOptions} from 'sequelize-typescript';
 import {CasbinRule} from './casbinRule';
-
-function ModelFactory(model: typeof CasbinRule) {
-    return class extends model {
-    };
-}
 
 /**
  * SequelizeAdapter represents the Sequelize adapter for policy storage.
  */
 export class SequelizeAdapter implements Adapter {
-    private connStr: string;
-    private dbSpecified: boolean;
-
+    private option: SequelizeOptions;
     private sequelize: Sequelize;
-    private static modelMap: Map<Sequelize, typeof CasbinRule> = new Map();
 
-    constructor(connStr: string, dbSpecified: boolean) {
-        this.connStr = connStr;
-        this.dbSpecified = dbSpecified;
+    constructor(option: SequelizeOptions) {
+        this.option = option;
     }
 
     /**
      * newAdapter is the constructor.
-     * dbSpecified is an optional boolean parameter. The default value is false.
-     * It's up to whether you have specified an existing DB in connStr.
-     * If dbSpecified == true, you need to make sure the DB in connStr exists.
-     * If dbSpecified == false, the adapter will automatically create a DB named 'casbin'.
+     * @param option sequelize connection option
      */
-    public static async newAdapter(connStr: string, dbSpecified: boolean = false) {
-        const a = new SequelizeAdapter(connStr, dbSpecified);
+    public static async newAdapter(option: SequelizeOptions) {
+        const a = new SequelizeAdapter(option);
         await a.open();
 
         return a;
     }
 
-    private async createDatabase() {
-        const uriConfig: ISequelizeUriConfig = {
-            url: this.connStr,
-            logging: false,
-            pool: {max: 5, min: 0, idle: 10000}
-        };
-        const sequelize = new Sequelize(uriConfig);
-        await sequelize.authenticate();
-
-        await sequelize.query('CREATE DATABASE IF NOT EXISTS casbin');
-
-        await sequelize.close();
-    }
-
     private async open() {
-        let url = this.connStr;
-        if (!this.dbSpecified) {
-            url = this.connStr + 'casbin';
-            await this.createDatabase();
-        }
-
-        const uriConfig: ISequelizeUriConfig = {
-            url,
-            logging: false,
-            pool: {max: 5, min: 0, idle: 10000}
-        };
-
-        this.sequelize = new Sequelize(uriConfig);
+        this.sequelize = new Sequelize(this.option);
         await this.sequelize.authenticate();
-
-        const Rule = ModelFactory(CasbinRule);
-        SequelizeAdapter.modelMap.set(this.sequelize, Rule);
-        this.sequelize.addModels([Rule]);
-
+        this.sequelize.addModels([CasbinRule]);
         await this.createTable();
     }
 
@@ -91,17 +49,12 @@ export class SequelizeAdapter implements Adapter {
         await this.sequelize.close();
     }
 
-    private getCasbinRuleModel(): typeof CasbinRule {
-        const model = SequelizeAdapter.modelMap.get(this.sequelize);
-        return !model ? CasbinRule : model;
-    }
-
     private async createTable() {
-        await this.getCasbinRuleModel().sync();
+        await this.sequelize.sync();
     }
 
     private async dropTable() {
-        await this.getCasbinRuleModel().destroy({where: {}, truncate: true});
+        await this.sequelize.getRepository(CasbinRule).destroy({where: {}, truncate: true});
     }
 
     private loadPolicyLine(line: CasbinRule, model: Model) {
@@ -113,7 +66,7 @@ export class SequelizeAdapter implements Adapter {
      * loadPolicy loads all policy rules from the storage.
      */
     public async loadPolicy(model: Model) {
-        const lines = await this.getCasbinRuleModel().findAll();
+        const lines = await this.sequelize.getRepository(CasbinRule).findAll();
 
         for (const line of lines) {
             this.loadPolicyLine(line, model);
@@ -121,8 +74,7 @@ export class SequelizeAdapter implements Adapter {
     }
 
     private savePolicyLine(ptype: string, rule: string[]): CasbinRule {
-        const Rule = this.getCasbinRuleModel();
-        const line = new Rule();
+        const line = new CasbinRule();
 
         line.ptype = ptype;
         if (rule.length > 0) {
@@ -154,8 +106,7 @@ export class SequelizeAdapter implements Adapter {
         await this.dropTable();
         await this.createTable();
 
-        let astMap = model.model.get('p');
-        // @ts-ignore
+        let astMap = model.model.get('p')!;
         for (const [ptype, ast] of astMap) {
             for (const rule of ast.policy) {
                 const line = this.savePolicyLine(ptype, rule);
@@ -163,8 +114,7 @@ export class SequelizeAdapter implements Adapter {
             }
         }
 
-        astMap = model.model.get('g');
-        // @ts-ignore
+        astMap = model.model.get('g')!;
         for (const [ptype, ast] of astMap) {
             for (const rule of ast.policy) {
                 const line = this.savePolicyLine(ptype, rule);
@@ -189,15 +139,15 @@ export class SequelizeAdapter implements Adapter {
     public async removePolicy(sec: string, ptype: string, rule: string[]) {
         const line = this.savePolicyLine(ptype, rule);
         const where = {};
-        Object.keys(line.dataValues)
+
+        Object.keys(line.get({plain: true}))
             .filter(key => key !== 'id')
             .forEach(key => {
                 // @ts-ignore
                 where[key] = line[key];
             });
 
-        // @ts-ignore
-        await this.getCasbinRuleModel().destroy({where});
+        await this.sequelize.getRepository(CasbinRule).destroy({where});
     }
 
     /**

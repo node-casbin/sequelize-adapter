@@ -23,7 +23,13 @@ function testGetPolicy(e: Enforcer, res: string[][]) {
 }
 
 test('TestAdapter', async () => {
-    const a = await SequelizeAdapter.newAdapter('mysql://root:@localhost:3306/');
+    const a = await SequelizeAdapter.newAdapter({
+        username: 'root',
+        password: '',
+        database: 'casbin',
+        dialect: 'mysql'
+    });
+
     try {
         // Because the DB is empty at first,
         // so we need to load the policy from the file adapter (.CSV) first.

@@ -106,11 +106,13 @@ export class SequelizeAdapter implements Adapter {
         await this.dropTable();
         await this.createTable();
 
+        const lines: CasbinRule[] = [];
+
         let astMap = model.model.get('p')!;
         for (const [ptype, ast] of astMap) {
             for (const rule of ast.policy) {
                 const line = this.savePolicyLine(ptype, rule);
-                await line.save();
+                lines.push(line);
             }
         }
 
@@ -118,9 +120,11 @@ export class SequelizeAdapter implements Adapter {
         for (const [ptype, ast] of astMap) {
             for (const rule of ast.policy) {
                 const line = this.savePolicyLine(ptype, rule);
-                await line.save();
+                lines.push(line);
             }
         }
+
+        CasbinRule.bulkCreate(lines.map(l => l.get({ plain: true })));
 
         return true;
     }

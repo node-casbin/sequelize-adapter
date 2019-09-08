@@ -53,10 +53,6 @@ export class SequelizeAdapter implements Adapter {
         await this.sequelize.sync();
     }
 
-    private async dropTable() {
-        await this.sequelize.getRepository(CasbinRule).destroy({where: {}, truncate: true});
-    }
-
     private loadPolicyLine(line: CasbinRule, model: Model) {
         const result = line.ptype + ', ' + [line.v0, line.v1, line.v2, line.v3, line.v4, line.v5].filter(n => n).join(', ');
         Helper.loadPolicyLine(result, model);
@@ -103,29 +99,32 @@ export class SequelizeAdapter implements Adapter {
      * savePolicy saves all policy rules to the storage.
      */
     public async savePolicy(model: Model) {
-        await this.dropTable();
-        await this.createTable();
+        await this.sequelize.transaction(async tx => {
 
-        const lines: CasbinRule[] = [];
+            // truncate casbin table
+            await this.sequelize.getRepository(CasbinRule).destroy({where: {}, truncate: true, transaction: tx});
 
-        let astMap = model.model.get('p')!;
-        for (const [ptype, ast] of astMap) {
-            for (const rule of ast.policy) {
-                const line = this.savePolicyLine(ptype, rule);
-                lines.push(line);
+            const lines: CasbinRule[] = [];
+
+            let astMap = model.model.get('p')!;
+            for (const [ptype, ast] of astMap) {
+                for (const rule of ast.policy) {
+                    const line = this.savePolicyLine(ptype, rule);
+                    lines.push(line);
+                }
             }
-        }
 
-        astMap = model.model.get('g')!;
-        for (const [ptype, ast] of astMap) {
-            for (const rule of ast.policy) {
-                const line = this.savePolicyLine(ptype, rule);
-                lines.push(line);
+            astMap = model.model.get('g')!;
+            for (const [ptype, ast] of astMap) {
+                for (const rule of ast.policy) {
+                    const line = this.savePolicyLine(ptype, rule);
+                    lines.push(line);
+                }
             }
-        }
 
-        CasbinRule.bulkCreate(lines.map(l => l.get({ plain: true })));
+            await CasbinRule.bulkCreate(lines.map(l => l.get({ plain: true })), { transaction: tx });
 
+        });
         return true;
     }
 

@@ -22,6 +22,13 @@ function testGetPolicy(e: Enforcer, res: string[][]) {
     expect(Util.array2DEquals(res, myRes)).toBe(true);
 }
 
+function testGetGroupingPolicy(e: Enforcer, res: string[][]) {
+    const myRes = e.getGroupingPolicy();
+    console.log('GroupingPolicy: ', myRes);
+
+    expect(Util.array2DEquals(res, myRes)).toBe(true);
+}
+
 test('TestAdapter', async () => {
     const a = await SequelizeAdapter.newAdapter({
         username: 'root',
@@ -83,6 +90,14 @@ test('TestAdapter', async () => {
             ['bob', 'data2', 'write'],
             ['data2_admin', 'data2', 'read'],
             ['data2_admin', 'data2', 'write']]);
+
+        testGetGroupingPolicy(e, [
+            ['alice', 'data2_admin']
+        ]);
+
+        // Remove groupingPolicy from DB
+        await e.deleteUser('alice');
+        testGetGroupingPolicy(e, [])
     } finally {
         await a.close();
     }

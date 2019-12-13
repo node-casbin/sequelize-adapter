@@ -157,6 +157,39 @@ export class SequelizeAdapter implements Adapter {
      * removeFilteredPolicy removes policy rules that match the filter from the storage.
      */
     public async removeFilteredPolicy(sec: string, ptype: string, fieldIndex: number, ...fieldValues: string[]) {
-        throw new Error('not implemented');
+        const line = new CasbinRule();
+
+        const idx = fieldIndex + fieldValues.length;
+        if (fieldIndex <= 0 && 0 < idx) {
+            line.v0 = fieldValues[0 - fieldIndex];
+        }
+        if (fieldIndex <= 1 && 1 < idx) {
+            line.v1 = fieldValues[1 - fieldIndex];
+        }
+        if (fieldIndex <= 2 && 2 < idx) {
+            line.v2 = fieldValues[2 - fieldIndex];
+        }
+        if (fieldIndex <= 3 && 3 < idx) {
+            line.v3 = fieldValues[3 - fieldIndex];
+        }
+        if (fieldIndex <= 4 && 4 < idx) {
+            line.v4 = fieldValues[4 - fieldIndex];
+        }
+        if (fieldIndex <= 5 && 5 < idx) {
+            line.v5 = fieldValues[5 - fieldIndex];
+        }
+
+        const where = {};
+
+        Object.keys(line.get({plain: true}))
+            .filter(key => key !== 'id')
+            .forEach(key => {
+                // @ts-ignore
+                where[key] = line[key];
+            });
+
+        await this.sequelize.getRepository(CasbinRule).destroy({
+            where
+        });
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "casbin-sequelize-adapter",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Sequelize adapter for Casbin",
   "main": "lib/adapter.js",
   "typings": "lib/adapter.d.ts",
@@ -20,7 +20,7 @@
     "husky": "^0.14.3",
     "jest": "^24.8.0",
     "lint-staged": "^7.2.0",
-    "mysql2": "^1.6.1",
+    "mysql2": "^2.1.0",
     "rimraf": "^2.6.2",
     "ts-jest": "^24.0.2",
     "tslint": "^5.11.0",

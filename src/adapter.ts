@@ -137,7 +137,21 @@ export class SequelizeAdapter implements Adapter {
     }
 
     /**
-     * removePolicy removes a policy rule from the storage.
+     * addPolicies adds a policyList rules to the storage.
+     */
+    public async addPolicies(sec: string, ptype: string, rules: string[][]) {
+        const lines: CasbinRule[] = [];
+        for (const rule of rules) {
+            const line = this.savePolicyLine(ptype, rule);
+            lines.push(line);
+        }
+        await this.sequelize.transaction(async tx => {
+            await CasbinRule.bulkCreate(lines.map(l => l.get({ plain: true })), { transaction: tx });
+        });
+    }
+
+    /**
+     * removePolicies removes a policyList rule from the storage.
      */
     public async removePolicy(sec: string, ptype: string, rule: string[]) {
         const line = this.savePolicyLine(ptype, rule);
@@ -151,6 +165,28 @@ export class SequelizeAdapter implements Adapter {
             });
 
         await this.sequelize.getRepository(CasbinRule).destroy({where});
+    }
+
+    /**
+     * removePolicies removes a policyList rule from the storage.
+     */
+    public async removePolicies(sec: string, ptype: string, rules: string[][]) {
+        await this.sequelize.transaction( async tx => {
+            for (const rule of rules) {
+                const line = this.savePolicyLine(ptype, rule);
+                const where = {};
+
+                Object.keys(line.get({plain: true}))
+                    .filter(key => key !== 'id')
+                    .forEach(key => {
+                        // @ts-ignore
+                        where[key] = line[key];
+                    });
+
+                await this.sequelize.getRepository(CasbinRule).destroy({where, transaction: tx});
+            }
+        });
+
     }
 
     /**

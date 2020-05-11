@@ -82,8 +82,31 @@ test('TestAdapter', async () => {
             ['data2_admin', 'data2', 'write'],
             ['role', 'res', 'action']]);
 
+        // Add policyList to DB
+        await a.addPolicies('', 'p', [['role', 'res', 'GET'], ['role', 'res', 'POST']]);
+        e = await newEnforcer('examples/rbac_model.conf', a);
+        testGetPolicy(e, [
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write'],
+            ['role', 'res', 'action'],
+            ['role', 'res', 'GET'],
+            ['role', 'res', 'POST']]);
+
         // Remove policy from DB
         await a.removePolicy('', 'p', ['role', 'res', 'action']);
+        e = await newEnforcer('examples/rbac_model.conf', a);
+        testGetPolicy(e, [
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write'],
+            ['role', 'res', 'GET'],
+            ['role', 'res', 'POST']]);
+
+        // Remove policyList from DB
+        await a.removePolicies('', 'p', [['role', 'res', 'GET'], ['role', 'res', 'POST']]);
         e = await newEnforcer('examples/rbac_model.conf', a);
         testGetPolicy(e, [
             ['alice', 'data1', 'read'],

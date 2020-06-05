@@ -32,7 +32,7 @@ export class SequelizeAdapter implements Adapter {
      * @param database The name of the database
      * @param username The username which is used to authenticate against the database
      * @param password The password which is used to authenticate against the database
-     * @param option sequelize connection option
+     * @param options sequelize connection option
      */
     public static async newAdapter(database: string, username: string, password?: string, options?: SequelizeOptions): Promise<SequelizeAdapter>;
     public static async newAdapter(database: string, username: string, options?: SequelizeOptions): Promise<SequelizeAdapter>;

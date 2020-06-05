@@ -29,10 +29,32 @@ export class SequelizeAdapter implements Adapter {
 
     /**
      * newAdapter is the constructor.
+     * @param database The name of the database
+     * @param username The username which is used to authenticate against the database
+     * @param password The password which is used to authenticate against the database
      * @param option sequelize connection option
      */
-    public static async newAdapter(option: SequelizeOptions) {
-        const a = new SequelizeAdapter(option);
+    public static async newAdapter(database: string, username: string, password?: string, options?: SequelizeOptions): Promise<SequelizeAdapter>;
+    public static async newAdapter(database: string, username: string, options?: SequelizeOptions): Promise<SequelizeAdapter>;
+    public static async newAdapter(options: SequelizeOptions): Promise<SequelizeAdapter>;
+    public static async newAdapter(databaseOrOptions: string | SequelizeOptions, username?: string, passwordOrOptions?: string | SequelizeOptions, options?: SequelizeOptions): Promise<SequelizeAdapter> {
+        if (typeof databaseOrOptions === 'string') {
+            if (typeof passwordOrOptions === 'string') {
+                if (!options) {
+                    options = {};
+                }
+                options.password = passwordOrOptions;
+            } else {
+                options = passwordOrOptions ?? {};
+            }
+
+            options.database = databaseOrOptions;
+            options.username = username;
+        } else {
+            options = databaseOrOptions;
+        }
+
+        const a = new SequelizeAdapter(options);
         await a.open();
 
         return a;

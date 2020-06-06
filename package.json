@@ -6,19 +6,22 @@
   "typings": "lib/adapter.d.ts",
   "scripts": {
     "precommit": "lint-staged",
-    "prepublish": "yarn run lint && yarn run test && yarn build",
+    "prepublish": "yarn run format:check && yarn run lint && yarn run test && yarn build",
     "build": "rimraf lib && tsc",
-    "lint": "tslint \"src/**/*.ts\"",
-    "fix": "tslint \"src/**/*.ts\" --fix",
+    "lint": "eslint --ext .ts src/ test/",
     "test": "jest --forceExit",
     "format": "yarn format:check --write",
-    "format:check": "prettier --check \"**/*.{md,json}\" \"src/**/*.ts\""
+    "format:check": "prettier --check \"**/*.{md,json}\" \"{src,test}/**/*.ts\""
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.11",
     "@types/sequelize": "^4.28.9",
+    "@typescript-eslint/eslint-plugin": "^3.1.0",
+    "@typescript-eslint/parser": "^3.1.0",
     "coveralls": "^3.1.0",
+    "eslint": "^7.2.0",
+    "eslint-config-prettier": "^6.11.0",
     "husky": "^4.2.5",
     "jest": "^26.0.1",
     "lint-staged": "^10.2.9",

@@ -1,5 +1,5 @@
-Sequelize Adapter
-====
+# Sequelize Adapter
+
 [![NPM version][npm-image]][npm-url]
 [![NPM download][download-image]][download-url]
 [![codebeat badge](https://codebeat.co/badges/c17c9ee1-da42-4db3-8047-9574ad2b23b1)](https://codebeat.co/projects/github-com-node-casbin-sequelize-adapter-master)
@@ -31,31 +31,31 @@ You may find other 3rd-party supported DBs in Sequelize website or other places.
 
 ```typescript
 import casbin from 'casbin';
-import {SequelizeAdapter} from 'casbin-sequelize-adapter';
+import { SequelizeAdapter } from 'casbin-sequelize-adapter';
 
 async function myFunction() {
-    // Initialize a Sequelize adapter and use it in a Node-Casbin enforcer:
-    // The adapter can not automatically create database.
-    // But the adapter will automatically and use the table named "casbin_rule".    
-    // ORM should not create databases automatically.  
-    const a = await SequelizeAdapter.newAdapter({
-        username: 'root',
-        password: '',
-        database: 'casbin',
-        dialect: 'mysql'
-    });
+  // Initialize a Sequelize adapter and use it in a Node-Casbin enforcer:
+  // The adapter can not automatically create database.
+  // But the adapter will automatically and use the table named "casbin_rule".
+  // ORM should not create databases automatically.
+  const a = await SequelizeAdapter.newAdapter({
+    username: 'root',
+    password: '',
+    database: 'casbin',
+    dialect: 'mysql',
+  });
 
-    const e = await casbin.newEnforcer('examples/rbac_model.conf', a);
+  const e = await casbin.newEnforcer('examples/rbac_model.conf', a);
 
-    // Check the permission.
-    e.enforce('alice', 'data1', 'read');
+  // Check the permission.
+  e.enforce('alice', 'data1', 'read');
 
-    // Modify the policy.
-    // await e.addPolicy(...);
-    // await e.removePolicy(...);
+  // Modify the policy.
+  // await e.addPolicy(...);
+  // await e.removePolicy(...);
 
-    // Save the policy back to DB.
-    await e.savePolicy();
+  // Save the policy back to DB.
+  await e.savePolicy();
 }
 ```
 

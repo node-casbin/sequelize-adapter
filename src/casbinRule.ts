@@ -12,28 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Table, Column, Model} from 'sequelize-typescript';
+import { Table, Column, Model } from 'sequelize-typescript';
 
-@Table({tableName: 'casbin_rule', timestamps: false})
+@Table({ tableName: 'casbin_rule', timestamps: false })
 export class CasbinRule extends Model<CasbinRule> {
-    @Column
-    public ptype: string;
+  @Column
+  public ptype: string;
 
-    @Column
-    public v0: string;
+  @Column
+  public v0: string;
 
-    @Column
-    public v1: string;
+  @Column
+  public v1: string;
 
-    @Column
-    public v2: string;
+  @Column
+  public v2: string;
 
-    @Column
-    public v3: string;
+  @Column
+  public v3: string;
 
-    @Column
-    public v4: string;
+  @Column
+  public v4: string;
 
-    @Column
-    public v5: string;
+  @Column
+  public v5: string;
 }

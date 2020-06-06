@@ -15,18 +15,18 @@
 import {newEnforcer, Enforcer, Util} from 'casbin';
 import {SequelizeAdapter} from '../src/adapter';
 
-function testGetPolicy(e: Enforcer, res: string[][]) {
+async function testGetPolicy(e: Enforcer, res: string[][]) {
     const myRes = e.getPolicy();
     console.log('Policy: ', myRes);
 
-    expect(Util.array2DEquals(res, myRes)).toBe(true);
+    expect(Util.array2DEquals(res, await myRes)).toBe(true);
 }
 
-function testGetGroupingPolicy(e: Enforcer, res: string[][]) {
+async function testGetGroupingPolicy(e: Enforcer, res: string[][]) {
     const myRes = e.getGroupingPolicy();
     console.log('GroupingPolicy: ', myRes);
 
-    expect(Util.array2DEquals(res, myRes)).toBe(true);
+    expect(Util.array2DEquals(res, await myRes)).toBe(true);
 }
 
 test('TestAdapter', async () => {

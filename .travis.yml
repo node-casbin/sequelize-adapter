@@ -4,7 +4,7 @@ sudo: false
 
 node_js:
   - 'stable'
-  - '8'
+  - '12'
 
 install: yarn install
 cache:

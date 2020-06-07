@@ -25,8 +25,8 @@ jobs:
       - name: Test
         run: |
           yarn run jest --coverage --forceExit
-          cat ./coverage/lcov.info
-          ./node_modules/coveralls/bin/coveralls.js
+          cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+          rm -rf ./coverage
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@master
         with:

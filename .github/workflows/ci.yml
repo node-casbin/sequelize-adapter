@@ -14,5 +14,6 @@ jobs:
       - uses: mirromutth/mysql-action@v1.1
         with:
           mysql user: 'root'
+          mysql password: ''
       - run: mysql -e 'CREATE DATABASE casbin;'
       - run: yarn

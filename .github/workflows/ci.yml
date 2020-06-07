@@ -22,16 +22,11 @@ jobs:
           node-version: 12
       - run: mysql --host 127.0.0.1 --port 3306 -uroot -p -e "CREATE DATABASE casbin"
       - run: yarn
-      - name: Test
-        run: |
-          yarn run jest --coverage --forceExit
-          cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js --verbose
-          rm -rf ./coverage
+      - run: yarn run jest --coverage --forceExit
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
-          parallel: true
 
   finish:
     needs: build

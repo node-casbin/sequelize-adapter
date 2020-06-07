@@ -11,6 +11,8 @@ jobs:
         image: mysql:latest
         ports:
           - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
 
     steps:

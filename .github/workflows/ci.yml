@@ -11,8 +11,6 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql root password: ''
+      - run: docker run -d -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true
       - run: mysql -e 'CREATE DATABASE casbin;'
       - run: yarn

@@ -13,7 +13,6 @@ jobs:
           node-version: 12
       - uses: mirromutth/mysql-action@v1.1
         with:
-          mysql user: 'root'
-          mysql password: ''
+          mysql root password: ''
       - run: mysql -e 'CREATE DATABASE casbin;'
       - run: yarn

@@ -9,8 +9,11 @@ jobs:
     services:
       mysql:
         image: mysql:latest
+        ports:
+          - 3306
         env:
           MYSQL_USER: root
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
 
     steps:
       - uses: actions/checkout@v2

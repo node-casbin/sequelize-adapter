@@ -11,6 +11,6 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: docker run -d -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - run: docker run -d -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql
       - run: mysql -e 'CREATE DATABASE casbin;'
       - run: yarn

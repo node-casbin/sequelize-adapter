@@ -45,7 +45,7 @@
   "homepage": "https://casbin.org",
   "repository": {
     "type": "git",
-    "url": "https://github.com/node-casbin/casbin-sequelize-adapter.git"
+    "url": "https://github.com/node-casbin/sequelize-adapter.git"
   },
   "keywords": [
     "casbin",

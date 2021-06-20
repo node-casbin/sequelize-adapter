@@ -13,7 +13,12 @@
 // limitations under the License.
 
 import { Adapter, Helper, Model } from 'casbin';
-import { Sequelize, SequelizeOptions, getOptions, setOptions } from 'sequelize-typescript';
+import {
+  Sequelize,
+  SequelizeOptions,
+  getOptions,
+  setOptions,
+} from 'sequelize-typescript';
 import { ModelOptions } from 'sequelize';
 import { CasbinRule } from './casbinRule';
 
@@ -23,9 +28,9 @@ import { CasbinRule } from './casbinRule';
 export class SequelizeAdapter implements Adapter {
   private option: SequelizeOptions;
   private sequelize: Sequelize;
-  private hookModelOption: ((option: ModelOptions) => void) | undefined;
+  private hookModelOption?: ModelOptions;
 
-  constructor(option: SequelizeOptions, hookModelOption?: (option: ModelOptions) => void) {
+  constructor(option: SequelizeOptions, hookModelOption?: ModelOptions) {
     this.option = option;
     this.hookModelOption = hookModelOption;
   }
@@ -37,7 +42,7 @@ export class SequelizeAdapter implements Adapter {
    */
   public static async newAdapter(
     option: SequelizeOptions,
-    hookModelOption?: (option: ModelOptions) => void
+    hookModelOption?: ModelOptions
   ): Promise<SequelizeAdapter> {
     const a = new SequelizeAdapter(option, hookModelOption);
     await a.open();
@@ -54,11 +59,11 @@ export class SequelizeAdapter implements Adapter {
 
   private beforeAddModel(): void {
     const options = getOptions(CasbinRule.prototype);
-    if (options != undefined){
-      if (this.hookModelOption != undefined){
-        this.hookModelOption(options)
+    if (options != undefined) {
+      if (this.hookModelOption != undefined) {
+        this.hookModelOption = options;
       }
-      setOptions(CasbinRule.prototype, options)
+      setOptions(CasbinRule.prototype, options);
     }
   }
 

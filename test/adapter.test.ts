@@ -35,14 +35,17 @@ async function testGetGroupingPolicy(
 test(
   'TestAdapter',
   async () => {
-    const a = await SequelizeAdapter.newAdapter({
-      username: 'root',
-      password: '',
-      database: 'casbin',
-      dialect: 'mysql',
-    }, option => {
-      option.tableName = "casbin_rule_test"
-    });
+    const a = await SequelizeAdapter.newAdapter(
+      {
+        username: 'root',
+        password: '',
+        database: 'casbin',
+        dialect: 'mysql',
+      },
+      (option) => {
+        option.tableName = 'casbin_rule_test';
+      }
+    );
 
     try {
       // Because the DB is empty at first,

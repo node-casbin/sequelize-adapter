@@ -42,9 +42,8 @@ test(
         database: 'casbin',
         dialect: 'mysql',
       },
-      (option) => {
-        option.tableName = 'casbin_rule_test';
-      }
+      {tableName: 'casbin_rule_test'}
+
     );
 
     try {

@@ -28,7 +28,7 @@ import { CasbinRule } from './casbinRule';
 export class SequelizeAdapter implements Adapter {
   private option: SequelizeOptions;
   private sequelize: Sequelize;
-  private hookModelOption?: ModelOptions;
+  private hookModelOption?: ModelOptions ;
 
   constructor(option: SequelizeOptions, hookModelOption?: ModelOptions) {
     this.option = option;

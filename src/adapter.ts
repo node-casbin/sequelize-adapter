@@ -229,6 +229,7 @@ export class SequelizeAdapter implements Adapter {
     ...fieldValues: string[]
   ): Promise<void> {
     const line = new CasbinRule();
+    line.ptype = ptype;
 
     const idx = fieldIndex + fieldValues.length;
     if (fieldIndex <= 0 && 0 < idx) {

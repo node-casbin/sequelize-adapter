@@ -27,8 +27,6 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
-      - name: Run Unit test
-        run: yarn run test
 
   finish:
     needs: build
@@ -41,7 +39,7 @@ jobs:
           parallel-finished: true
 
   semantic-release:
-    needs: [ test ]
+    needs:  build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

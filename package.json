@@ -11,7 +11,10 @@
     "lint": "eslint --ext .ts src/ test/",
     "test": "jest --forceExit",
     "format": "yarn format:check --write",
-    "format:check": "prettier --check \"**/*.{md,json}\" \"{src,test}/**/*.ts\""
+    "format:check": "prettier --check \"**/*.{md,json}\" \"{src,test}/**/*.ts\"",
+    "prepack": "run-s build",
+    "postpack": "run-s clean",
+    "release": "npx -p semantic-release -p @semantic-release/git -p @semantic-release/changelog semantic-release"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
@@ -37,7 +40,8 @@
     "casbin": "^5.0.3",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.6.2",
-    "sequelize-typescript": "^2.1.0"
+    "sequelize-typescript": "^2.1.0",
+    "rimraf": "^3.0.2"
   },
   "files": [
     "lib",

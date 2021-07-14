@@ -27,6 +27,8 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
+      - name: Run Unit test
+        run: yarn run test
 
   finish:
     needs: build

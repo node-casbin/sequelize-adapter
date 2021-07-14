@@ -38,18 +38,18 @@ jobs:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
 
-semantic-release:
-  needs: [ test ]
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v2
+  semantic-release:
+    needs: [ test ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-    - name: Run semantic-release
-      if: github.repository == 'node-casbin/sequelize-adapter' && github.event_name == 'push'
-      run: |
-        yarn install --no-lockfile
-        yarn run prepack
-        yarn run release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Run semantic-release
+        if: github.repository == 'node-casbin/sequelize-adapter' && github.event_name == 'push'
+        run: |
+          yarn install --no-lockfile
+          yarn run prepack
+          yarn run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

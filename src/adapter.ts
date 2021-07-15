@@ -14,16 +14,20 @@
 
 import { Adapter, Helper, Model } from 'casbin';
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
-import { CasbinRule } from './casbinRule';
+import { CasbinRule, updateCasbinRule } from './casbinRule';
+
+export interface SequelizeAdapterOptions extends SequelizeOptions {
+  tableName?: string;
+}
 
 /**
  * SequelizeAdapter represents the Sequelize adapter for policy storage.
  */
 export class SequelizeAdapter implements Adapter {
-  private option: SequelizeOptions;
+  private readonly option: SequelizeAdapterOptions;
   private sequelize: Sequelize;
 
-  constructor(option: SequelizeOptions) {
+  constructor(option: SequelizeAdapterOptions) {
     this.option = option;
   }
 
@@ -32,7 +36,7 @@ export class SequelizeAdapter implements Adapter {
    * @param option sequelize connection option
    */
   public static async newAdapter(
-    option: SequelizeOptions
+    option: SequelizeAdapterOptions
   ): Promise<SequelizeAdapter> {
     const a = new SequelizeAdapter(option);
     await a.open();
@@ -42,6 +46,7 @@ export class SequelizeAdapter implements Adapter {
 
   private async open(): Promise<void> {
     this.sequelize = new Sequelize(this.option);
+    updateCasbinRule(this.option.tableName);
     await this.sequelize.authenticate();
     this.sequelize.addModels([CasbinRule]);
     await this.createTable();

@@ -40,6 +40,7 @@ test(
       password: '',
       database: 'casbin',
       dialect: 'mysql',
+      tableName: 'something'
     });
 
     try {

@@ -22,6 +22,8 @@ jobs:
           node-version: 12
       - run: mysql --host 127.0.0.1 --port 3306 -uroot -p -e "CREATE DATABASE casbin"
       - run: yarn
+      - run: yarn format:check
+      - run: yarn lint
       - run: yarn run jest --coverage --forceExit
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@master

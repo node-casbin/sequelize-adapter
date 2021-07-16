@@ -11,9 +11,8 @@
     "lint": "eslint --ext .ts src/ test/",
     "test": "jest --forceExit",
     "format": "yarn format:check --write",
-    "format:check": "prettier --check \"**/*.{md,json}\" \"{src,test}/**/*.ts\"",
-    "prepack": "run-s build",
-    "postpack": "run-s clean",
+    "format:check": "prettier --check \"{src,test}/**/*.ts\"",
+    "prepack": "run-s lint build",
     "release": "npx -p semantic-release -p @semantic-release/git -p @semantic-release/changelog semantic-release"
   },
   "devDependencies": {
@@ -24,6 +23,8 @@
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^3.1.0",
     "coveralls": "^3.1.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "husky": "^4.2.5",
@@ -31,17 +32,17 @@
     "lint-staged": "^10.2.9",
     "mysql2": "^2.1.0",
     "prettier": "^2.0.5",
-    "rimraf": "^3.0.2",
     "ts-jest": "^26.1.0",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5"
   },
+  "peerDependencies": {
+    "casbin": "^5.0.3"
+  },
   "dependencies": {
-    "casbin": "^5.0.3",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.6.2",
-    "sequelize-typescript": "^2.1.0",
-    "rimraf": "^3.0.2"
+    "sequelize-typescript": "^2.1.0"
   },
   "files": [
     "lib",

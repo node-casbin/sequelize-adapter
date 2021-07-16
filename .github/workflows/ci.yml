@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: 12
       - run: mysql --host 127.0.0.1 --port 3306 -uroot -p -e "CREATE DATABASE casbin"
@@ -39,7 +39,7 @@ jobs:
           parallel-finished: true
 
   semantic-release:
-    needs:  build
+    needs: [finish, build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

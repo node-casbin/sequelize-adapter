@@ -6,7 +6,6 @@
   "typings": "lib/adapter.d.ts",
   "scripts": {
     "precommit": "lint-staged",
-    "prepublish": "yarn run format:check && yarn run lint && yarn run test && yarn build",
     "build": "rimraf lib && tsc",
     "lint": "eslint --ext .ts src/ test/",
     "test": "jest --forceExit",

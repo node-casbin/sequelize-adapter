@@ -20,8 +20,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 12
-      - run: mysql --host 127.0.0.1 --port 3306 -uroot -p -e "CREATE DATABASE casbin"
       - run: yarn
+      - run: mysql --host 127.0.0.1 --port 3306 -uroot -p -e "CREATE DATABASE casbin"
       - run: yarn format:check
       - run: yarn lint
       - run: yarn run jest --coverage --forceExit
@@ -43,12 +43,21 @@ jobs:
   semantic-release:
     needs: [finish, build]
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
     steps:
       - uses: actions/checkout@v2
       - name: Run semantic-release
         if: github.repository == 'node-casbin/sequelize-adapter' && github.event_name == 'push'
         run: |
           yarn install --no-lockfile
+          mysql --host 127.0.0.1 --port 3306 -uroot -p -e "CREATE DATABASE casbin"
           yarn run prepack
           yarn run release
         env:

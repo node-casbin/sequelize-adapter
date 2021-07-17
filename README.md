@@ -3,7 +3,7 @@
 [![NPM version][npm-image]][npm-url]
 [![NPM download][download-image]][download-url]
 [![codebeat badge](https://codebeat.co/badges/c17c9ee1-da42-4db3-8047-9574ad2b23b1)](https://codebeat.co/projects/github-com-node-casbin-sequelize-adapter-master)
-[![Build Status](https://travis-ci.org/node-casbin/sequelize-adapter.svg?branch=master)](https://travis-ci.org/node-casbin/sequelize-adapter)
+[![ci](https://github.com/node-casbin/sequelize-adapter/actions/workflows/ci.yml/badge.svg)](https://github.com/node-casbin/sequelize-adapter/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/node-casbin/sequelize-adapter/badge.svg?branch=master)](https://coveralls.io/github/node-casbin/sequelize-adapter?branch=master)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 

@@ -135,6 +135,14 @@ test(
         ['data2_admin', 'data2', 'write'],
       ]);
 
+      await a.removeFilteredPolicy('', 'p', 0, 'alice');
+      e = await newEnforcer('examples/rbac_model.conf', a);
+      testGetPolicy(e, [
+        ['bob', 'data2', 'write'],
+        ['data2_admin', 'data2', 'read'],
+        ['data2_admin', 'data2', 'write'],
+      ]);
+
       testGetGroupingPolicy(e, [['alice', 'data2_admin']]);
 
       // Remove groupingPolicy from DB

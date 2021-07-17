@@ -34,14 +34,14 @@
     "ts-jest": "^26.1.0",
     "tslint": "^6.1.2",
     "typescript": "^3.9.5",
-    "casbin": "^5.0.3"
+    "casbin": "<=5.9.0 || >5.9.1"
   },
   "peerDependencies": {
-    "casbin": "^5.0.3"
+    "casbin": "<=5.9.0 || >5.9.1"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.6.2",
+    "sequelize": "6.6.2",
     "sequelize-typescript": "^2.1.0"
   },
   "files": [

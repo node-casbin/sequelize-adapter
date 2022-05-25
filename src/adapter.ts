@@ -20,6 +20,10 @@ export interface SequelizeAdapterOptions extends SequelizeOptions {
   tableName?: string;
 }
 
+export type CasbinRuleFilter = Array<string | null | undefined>;
+
+export type CasbinFilter = Record<string, CasbinRuleFilter>;
+
 /**
  * SequelizeAdapter represents the Sequelize adapter for policy storage.
  */
@@ -225,52 +229,34 @@ export class SequelizeAdapter implements Adapter {
   }
 
   /**
-   * loadFilteredPolicy loads policy rules that match the filter from the storage
+   * loadFilteredPolicy loads policy rules that match the filter from the storage;
+   * use an empty string for selecting all values in a certain field.
    */
   public async loadFilteredPolicy(
     model: Model,
-    sec: string,
-    ptype: string,
-    fieldIndex: number,
-    ...fieldValues: string[]
+    filter: { [key: string]: string[][] },
   ): Promise<void>  {
-    const line = new CasbinRule();
-    line.ptype = ptype;
-
-    const idx = fieldIndex + fieldValues.length;
-    if (fieldIndex <= 0 && 0 < idx) {
-      line.v0 = fieldValues[0 - fieldIndex];
-    }
-    if (fieldIndex <= 1 && 1 < idx) {
-      line.v1 = fieldValues[1 - fieldIndex];
-    }
-    if (fieldIndex <= 2 && 2 < idx) {
-      line.v2 = fieldValues[2 - fieldIndex];
-    }
-    if (fieldIndex <= 3 && 3 < idx) {
-      line.v3 = fieldValues[3 - fieldIndex];
-    }
-    if (fieldIndex <= 4 && 4 < idx) {
-      line.v4 = fieldValues[4 - fieldIndex];
-    }
-    if (fieldIndex <= 5 && 5 < idx) {
-      line.v5 = fieldValues[5 - fieldIndex];
-    }
-
-    const where = {};
-
-    Object.keys(line.get({ plain: true }))
-      .filter((key) => key !== 'id')
-      .forEach((key) => {
-        // @ts-ignore
-        where[key] = line[key];
+    const whereStatements = Object.keys(filter)
+      .map((ptype) => {
+        const policyPattern = filter[ptype];
+        return {
+          ptype,
+          ...(policyPattern[0]) && { v0: policyPattern[0] },
+          ...(policyPattern[1]) && { v1: policyPattern[1] },
+          ...(policyPattern[2]) && { v2: policyPattern[2] },
+          ...(policyPattern[3]) && { v3: policyPattern[3] },
+          ...(policyPattern[4]) && { v4: policyPattern[4] },
+          ...(policyPattern[5]) && { v5: policyPattern[5] },
+        };
       });
 
-    const lines = await this.sequelize.getRepository(CasbinRule).findAll({
-      where,
-    });
+      console.log(JSON.stringify({ whereStatements }, undefined, 2));
 
-    lines.forEach((line) => this.loadPolicyLine(line, model));
+    await Promise.all(whereStatements.map(((where) => this.sequelize.getRepository(CasbinRule).findAll({
+      where,
+    }).then((rules) => {
+      return rules.forEach(((rule) => this.loadPolicyLine(rule, model)))
+    }))));
   }
 
   /**

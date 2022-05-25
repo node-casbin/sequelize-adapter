@@ -250,8 +250,6 @@ export class SequelizeAdapter implements Adapter {
         };
       });
 
-      console.log(JSON.stringify({ whereStatements }, undefined, 2));
-
     await Promise.all(whereStatements.map(((where) => this.sequelize.getRepository(CasbinRule).findAll({
       where,
     }).then((rules) => {

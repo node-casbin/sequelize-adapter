@@ -29,7 +29,7 @@ async function testGetGroupingPolicy(
   const myRes = await e.getGroupingPolicy();
   console.log('GroupingPolicy: ', myRes);
 
-  expect(Util.array2DEquals(res, await myRes)).toBe(true);
+  expect(Util.array2DEquals(res, myRes)).toBe(true);
 }
 
 test(

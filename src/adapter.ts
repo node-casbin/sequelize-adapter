@@ -20,10 +20,6 @@ export interface SequelizeAdapterOptions extends SequelizeOptions {
   tableName?: string;
 }
 
-export type CasbinRuleFilter = Array<string | null | undefined>;
-
-export type CasbinFilter = Record<string, CasbinRuleFilter>;
-
 /**
  * SequelizeAdapter represents the Sequelize adapter for policy storage.
  */

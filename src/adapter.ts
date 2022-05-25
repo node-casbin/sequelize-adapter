@@ -26,9 +26,18 @@ export interface SequelizeAdapterOptions extends SequelizeOptions {
 export class SequelizeAdapter implements Adapter {
   private readonly option: SequelizeAdapterOptions;
   private sequelize: Sequelize;
+  private filtered = false;
 
   constructor(option: SequelizeAdapterOptions) {
     this.option = option;
+  }
+
+  public isFiltered(): boolean {
+      return this.filtered;
+  }
+
+  public enabledFiltered(enabled: boolean): void {
+      this.filtered = enabled;
   }
 
   /**
@@ -251,6 +260,7 @@ export class SequelizeAdapter implements Adapter {
     }).then((rules) => {
       return rules.forEach(((rule) => this.loadPolicyLine(rule, model)))
     }))));
+    this.enabledFiltered(true);
   }
 
   /**

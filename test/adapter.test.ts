@@ -165,11 +165,29 @@ test(
       // Clear the current policy.
       e.clearPolicy();
       testGetPolicy(e, []);
+
       // test load filtered policy
       await a.loadFilteredPolicy(e.getModel(), {
         p: [['data2_admin']],
       });
       testGetPolicy(e, [
+        ['data2_admin', 'data2', 'read'],
+        ['data2_admin', 'data2', 'write'],
+      ]);
+
+      // Clear the current policy.
+      e.clearPolicy();
+      testGetPolicy(e, []);
+
+      // test load filtered policy
+      await a.loadFilteredPolicy(e.getModel(), {
+        p: [
+          ['data2_admin'],
+          ['bob'],
+        ],
+      });
+      testGetPolicy(e, [
+        ['bob', 'data2', 'write'],
         ['data2_admin', 'data2', 'read'],
         ['data2_admin', 'data2', 'write'],
       ]);

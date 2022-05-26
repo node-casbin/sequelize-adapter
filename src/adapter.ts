@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { Adapter, Helper, Model } from 'casbin';
+import { Op } from 'sequelize';
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { CasbinRule, updateCasbinRule } from './casbinRule';
 
@@ -243,23 +244,27 @@ export class SequelizeAdapter implements Adapter {
   ): Promise<void>  {
     const whereStatements = Object.keys(filter)
       .map((ptype) => {
-        const policyPattern = filter[ptype];
-        return {
-          ptype,
-          ...(policyPattern[0]) && { v0: policyPattern[0] },
-          ...(policyPattern[1]) && { v1: policyPattern[1] },
-          ...(policyPattern[2]) && { v2: policyPattern[2] },
-          ...(policyPattern[3]) && { v3: policyPattern[3] },
-          ...(policyPattern[4]) && { v4: policyPattern[4] },
-          ...(policyPattern[5]) && { v5: policyPattern[5] },
-        };
+        const policyPatterns = filter[ptype];
+        return policyPatterns.map((policyPattern) => {
+          return {
+            ptype,
+            ...(policyPattern[0]) && { v0: policyPattern[0] },
+            ...(policyPattern[1]) && { v1: policyPattern[1] },
+            ...(policyPattern[2]) && { v2: policyPattern[2] },
+            ...(policyPattern[3]) && { v3: policyPattern[3] },
+            ...(policyPattern[4]) && { v4: policyPattern[4] },
+            ...(policyPattern[5]) && { v5: policyPattern[5] },
+          };
+        });
       });
 
-    await Promise.all(whereStatements.map(((where) => this.sequelize.getRepository(CasbinRule).findAll({
-      where,
-    }).then((rules) => {
-      return rules.forEach(((rule) => this.loadPolicyLine(rule, model)))
-    }))));
+    const where = {
+      [Op.or]: whereStatements.reduce((accumulator, value) => accumulator.concat(value), []),
+    }
+
+    const lines = await this.sequelize.getRepository(CasbinRule).findAll({ where });
+
+    lines.forEach((line) => this.loadPolicyLine(line, model));
     this.enabledFiltered(true);
   }
 

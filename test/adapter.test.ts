@@ -181,10 +181,7 @@ test(
 
       // test load filtered policy
       await a.loadFilteredPolicy(e.getModel(), {
-        p: [
-          ['data2_admin'],
-          ['bob'],
-        ],
+        p: [['data2_admin'], ['bob']],
       });
       testGetPolicy(e, [
         ['bob', 'data2', 'write'],

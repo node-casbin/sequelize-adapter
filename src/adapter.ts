@@ -34,11 +34,11 @@ export class SequelizeAdapter implements Adapter {
   }
 
   public isFiltered(): boolean {
-      return this.filtered;
+    return this.filtered;
   }
 
   public enabledFiltered(enabled: boolean): void {
-      this.filtered = enabled;
+    this.filtered = enabled;
   }
 
   /**
@@ -240,29 +240,33 @@ export class SequelizeAdapter implements Adapter {
    */
   public async loadFilteredPolicy(
     model: Model,
-    filter: { [key: string]: string[][] },
-  ): Promise<void>  {
-    const whereStatements = Object.keys(filter)
-      .map((ptype) => {
-        const policyPatterns = filter[ptype];
-        return policyPatterns.map((policyPattern) => {
-          return {
-            ptype,
-            ...(policyPattern[0]) && { v0: policyPattern[0] },
-            ...(policyPattern[1]) && { v1: policyPattern[1] },
-            ...(policyPattern[2]) && { v2: policyPattern[2] },
-            ...(policyPattern[3]) && { v3: policyPattern[3] },
-            ...(policyPattern[4]) && { v4: policyPattern[4] },
-            ...(policyPattern[5]) && { v5: policyPattern[5] },
-          };
-        });
+    filter: { [key: string]: string[][] }
+  ): Promise<void> {
+    const whereStatements = Object.keys(filter).map((ptype) => {
+      const policyPatterns = filter[ptype];
+      return policyPatterns.map((policyPattern) => {
+        return {
+          ptype,
+          ...(policyPattern[0] && { v0: policyPattern[0] }),
+          ...(policyPattern[1] && { v1: policyPattern[1] }),
+          ...(policyPattern[2] && { v2: policyPattern[2] }),
+          ...(policyPattern[3] && { v3: policyPattern[3] }),
+          ...(policyPattern[4] && { v4: policyPattern[4] }),
+          ...(policyPattern[5] && { v5: policyPattern[5] }),
+        };
       });
+    });
 
     const where = {
-      [Op.or]: whereStatements.reduce((accumulator, value) => accumulator.concat(value), []),
-    }
+      [Op.or]: whereStatements.reduce(
+        (accumulator, value) => accumulator.concat(value),
+        []
+      ),
+    };
 
-    const lines = await this.sequelize.getRepository(CasbinRule).findAll({ where });
+    const lines = await this.sequelize
+      .getRepository(CasbinRule)
+      .findAll({ where });
 
     lines.forEach((line) => this.loadPolicyLine(line, model));
     this.enabledFiltered(true);

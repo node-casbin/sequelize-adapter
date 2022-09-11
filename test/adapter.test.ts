@@ -16,20 +16,20 @@ import { newEnforcer, Enforcer, Util } from 'casbin';
 import { SequelizeAdapter } from '../src/adapter';
 
 async function testGetPolicy(e: Enforcer, res: string[][]): Promise<void> {
-  const myRes = e.getPolicy();
+  const myRes = await e.getPolicy();
   console.log('Policy: ', myRes);
 
-  expect(Util.array2DEquals(res, await myRes)).toBe(true);
+  expect(Util.array2DEquals(res, myRes)).toBe(true);
 }
 
 async function testGetGroupingPolicy(
   e: Enforcer,
   res: string[][]
 ): Promise<void> {
-  const myRes = e.getGroupingPolicy();
+  const myRes = await e.getGroupingPolicy();
   console.log('GroupingPolicy: ', myRes);
 
-  expect(Util.array2DEquals(res, await myRes)).toBe(true);
+  expect(Util.array2DEquals(res, myRes)).toBe(true);
 }
 
 test(
@@ -148,6 +148,50 @@ test(
       // Remove groupingPolicy from DB
       await e.deleteUser('alice');
       testGetGroupingPolicy(e, []);
+
+      // Clear the current policy.
+      e.clearPolicy();
+      testGetPolicy(e, []);
+
+      // test load simple filtered policy
+      await a.loadFilteredPolicy(e.getModel(), {
+        p: [['data2_admin']],
+      });
+      testGetPolicy(e, [
+        ['data2_admin', 'data2', 'read'],
+        ['data2_admin', 'data2', 'write'],
+      ]);
+
+      // Clear the current policy.
+      e.clearPolicy();
+      testGetPolicy(e, []);
+
+      // test load filtered policy
+      await a.loadFilteredPolicy(e.getModel(), {
+        p: [['data2_admin']],
+      });
+      testGetPolicy(e, [
+        ['data2_admin', 'data2', 'read'],
+        ['data2_admin', 'data2', 'write'],
+      ]);
+
+      // Clear the current policy.
+      e.clearPolicy();
+      testGetPolicy(e, []);
+
+      // test load filtered policy
+      await a.loadFilteredPolicy(e.getModel(), {
+        p: [['data2_admin'], ['bob']],
+      });
+      testGetPolicy(e, [
+        ['bob', 'data2', 'write'],
+        ['data2_admin', 'data2', 'read'],
+        ['data2_admin', 'data2', 'write'],
+      ]);
+
+      // Clear the current policy.
+      e.clearPolicy();
+      testGetPolicy(e, []);
     } finally {
       await a.close();
     }

@@ -19,6 +19,7 @@ import { CasbinRule, updateCasbinRule } from './casbinRule';
 
 export interface SequelizeAdapterOptions extends SequelizeOptions {
   tableName?: string;
+  schema?: string;
 }
 
 /**

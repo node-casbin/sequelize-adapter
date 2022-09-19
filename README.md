@@ -37,7 +37,7 @@ Yarn Install
 yarn add casbin-sequelize-adapter
 ```
 
-## Testing
+## Testing Locally
 
 Start mysql for tests:
 

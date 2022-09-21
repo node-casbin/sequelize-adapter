@@ -44,8 +44,12 @@ export class CasbinRule extends Model<CasbinRule> {
   public v5: string;
 }
 
-export function updateCasbinRule(tableName = 'casbin_rule'): void {
+export function updateCasbinRule(
+  tableName = 'casbin_rule',
+  schema?: string
+): void {
   const options = getOptions(CasbinRule.prototype);
   options!.tableName = tableName;
+  options!.schema = schema;
   setOptions(CasbinRule.prototype, options!);
 }

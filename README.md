@@ -25,7 +25,29 @@ You may find other 3rd-party supported DBs in Sequelize website or other places.
 
 ## Installation
 
-    npm install casbin-sequelize-adapter --save
+NPM Install
+
+```bash
+npm install casbin-sequelize-adapter --save
+```
+
+Yarn Install
+
+```bash
+yarn add casbin-sequelize-adapter
+```
+
+## Testing Locally
+
+Start mysql for tests:
+
+```bash
+docker compose up -d
+```
+
+```bash
+yarn test
+```
 
 ## Simple Example
 

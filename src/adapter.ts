@@ -126,7 +126,11 @@ export class SequelizeAdapter implements Adapter {
       // truncate casbin table
       await this.sequelize
         .getRepository(CasbinRule)
-        .destroy({ where: {} as WhereOptions, truncate: true, transaction: tx });
+        .destroy({
+          where: {} as WhereOptions,
+          truncate: true,
+          transaction: tx,
+        });
 
       const lines: CasbinRule[] = [];
 

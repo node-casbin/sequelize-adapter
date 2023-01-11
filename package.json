@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13",
-    "sequelize": "6.20.1",
+    "sequelize": "6.10.0",
     "sequelize-typescript": "2.1.2"
   },
   "files": [

@@ -124,13 +124,11 @@ export class SequelizeAdapter implements Adapter {
   public async savePolicy(model: Model): Promise<boolean> {
     await this.sequelize.transaction(async (tx) => {
       // truncate casbin table
-      await this.sequelize
-        .getRepository(CasbinRule)
-        .destroy({
-          where: {} as WhereOptions,
-          truncate: true,
-          transaction: tx,
-        });
+      await this.sequelize.getRepository(CasbinRule).destroy({
+        where: {} as WhereOptions,
+        truncate: true,
+        transaction: tx,
+      });
 
       const lines: CasbinRule[] = [];
 

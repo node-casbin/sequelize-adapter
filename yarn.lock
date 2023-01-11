@@ -4206,10 +4206,10 @@ sequelize-typescript@2.1.2:
   dependencies:
     glob "7.2.0"
 
-sequelize@6.10.0:
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-6.10.0.tgz#570307a35d9c9837148834af3f6948f683b5ff2c"
-  integrity sha512-vqKcteQZFSh+LkEBGWMZLwnE609FXTFFuyD7plJNlm8wPi3XQJ7ciUyVTC/3F+uxVHeyB2VSP9qz1ws7YqsqNw==
+sequelize@6.11.0:
+  version "6.11.0"
+  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-6.11.0.tgz#11620b02ab2ca02af59ec652dd22bef7ccd348af"
+  integrity sha512-+j3N5lr+FR1eicMRGR3bRsGOl9HMY0UGb2PyB2i1yZ64XBgsz3xejMH0UD45LcUitj40soDGIa9CyvZG0dfzKg==
   dependencies:
     debug "^4.1.1"
     dottie "^2.0.0"

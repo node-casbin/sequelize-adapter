@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { Adapter, Helper, Model } from 'casbin';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { CasbinRule, updateCasbinRule } from './casbinRule';
 
@@ -126,7 +126,7 @@ export class SequelizeAdapter implements Adapter {
       // truncate casbin table
       await this.sequelize
         .getRepository(CasbinRule)
-        .destroy({ where: {}, truncate: true, transaction: tx });
+        .destroy({ where: {} as WhereOptions, truncate: true, transaction: tx });
 
       const lines: CasbinRule[] = [];
 
@@ -196,7 +196,7 @@ export class SequelizeAdapter implements Adapter {
     rule: string[]
   ): Promise<void> {
     const line = this.savePolicyLine(ptype, rule);
-    const where = {};
+    const where = {} as WhereOptions;
 
     Object.keys(line.get({ plain: true }))
       .filter((key) => key !== 'id')
@@ -219,7 +219,7 @@ export class SequelizeAdapter implements Adapter {
     await this.sequelize.transaction(async (tx) => {
       for (const rule of rules) {
         const line = this.savePolicyLine(ptype, rule);
-        const where = {};
+        const where = {} as WhereOptions;
 
         Object.keys(line.get({ plain: true }))
           .filter((key) => key !== 'id')
@@ -305,7 +305,7 @@ export class SequelizeAdapter implements Adapter {
       line.v5 = fieldValues[5 - fieldIndex];
     }
 
-    const where = {};
+    const where = {} as WhereOptions;
 
     Object.keys(line.get({ plain: true }))
       .filter((key) => key !== 'id')

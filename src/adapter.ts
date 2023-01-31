@@ -29,9 +29,11 @@ export class SequelizeAdapter implements Adapter {
   private readonly option: SequelizeAdapterOptions;
   private sequelize: Sequelize;
   private filtered = false;
+  private autoCreate = true;
 
-  constructor(option: SequelizeAdapterOptions) {
+  constructor(option: SequelizeAdapterOptions, autoCreate = true) {
     this.option = option;
+    this.autoCreate = autoCreate;
   }
 
   public isFiltered(): boolean {
@@ -60,7 +62,9 @@ export class SequelizeAdapter implements Adapter {
     updateCasbinRule(this.option.tableName);
     await this.sequelize.authenticate();
     this.sequelize.addModels([CasbinRule]);
-    await this.createTable();
+    if (this.autoCreate) {
+      await this.createTable();
+    }
   }
 
   public async close(): Promise<void> {

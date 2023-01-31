@@ -49,9 +49,10 @@ export class SequelizeAdapter implements Adapter {
    * @param option sequelize connection option
    */
   public static async newAdapter(
-    option: SequelizeAdapterOptions
+    option: SequelizeAdapterOptions,
+    autoCreate?: boolean
   ): Promise<SequelizeAdapter> {
-    const a = new SequelizeAdapter(option);
+    const a = new SequelizeAdapter(option, autoCreate);
     await a.open();
 
     return a;

@@ -59,7 +59,7 @@ async function myFunction() {
   // Initialize a Sequelize adapter and use it in a Node-Casbin enforcer:
   // The adapter can not automatically create database.
   // But the adapter will automatically and use the table named "casbin_rule".
-  // The second parameter determines whether the adapter will automatically create a table.
+  // The second argument determines whether the adapter will automatically create a table.
   // ORM should not create databases automatically.
   const a = await SequelizeAdapter.newAdapter(
     {

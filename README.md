@@ -59,13 +59,17 @@ async function myFunction() {
   // Initialize a Sequelize adapter and use it in a Node-Casbin enforcer:
   // The adapter can not automatically create database.
   // But the adapter will automatically and use the table named "casbin_rule".
+  // The second boolean argument: autoCreateTable determines whether the adapter will automatically create the "casbin_rule" table.
   // ORM should not create databases automatically.
-  const a = await SequelizeAdapter.newAdapter({
-    username: 'root',
-    password: '',
-    database: 'casbin',
-    dialect: 'mysql',
-  });
+  const a = await SequelizeAdapter.newAdapter(
+    {
+      username: 'root',
+      password: '',
+      database: 'casbin',
+      dialect: 'mysql',
+    },
+    true,
+  );
 
   const e = await casbin.newEnforcer('examples/rbac_model.conf', a);
 

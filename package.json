@@ -12,8 +12,7 @@
     "format": "yarn format:check --write",
     "format:check": "prettier --check \"{src,test}/**/*.ts\"",
     "prepack": "run-s lint build",
-    "release": "npx -p semantic-release -p @semantic-release/git -p @semantic-release/changelog semantic-release",
-    "postinstall": "yarn build"
+    "release": "npx -p semantic-release -p @semantic-release/git -p @semantic-release/changelog semantic-release"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",

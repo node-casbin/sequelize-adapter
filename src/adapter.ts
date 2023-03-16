@@ -60,7 +60,7 @@ export class SequelizeAdapter implements Adapter {
 
   private async open(): Promise<void> {
     this.sequelize = new Sequelize(this.option);
-    updateCasbinRule(this.option.tableName);
+    updateCasbinRule(this.option.tableName, this.option.schema);
     await this.sequelize.authenticate();
     this.sequelize.addModels([CasbinRule]);
     if (this.autoCreateTable) {

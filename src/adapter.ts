@@ -15,7 +15,7 @@
 import { Adapter, Helper, Model } from 'casbin';
 import { Op } from 'sequelize';
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
-import { createCasbinRule, CasbinRule} from './casbinRule';
+import { createCasbinRule, CasbinRule } from './casbinRule';
 
 export interface SequelizeAdapterOptions extends SequelizeOptions {
   tableName?: string;
@@ -61,7 +61,10 @@ export class SequelizeAdapter implements Adapter {
 
   private async open(): Promise<void> {
     this.sequelize = new Sequelize(this.option);
-    this.CasbinRule = createCasbinRule(this.option.tableName, this.option.schema); // Set the property here
+    this.CasbinRule = createCasbinRule(
+      this.option.tableName,
+      this.option.schema
+    ); // Set the property here
     await this.sequelize.authenticate();
     this.sequelize.addModels([this.CasbinRule]);
     if (this.autoCreateTable) {

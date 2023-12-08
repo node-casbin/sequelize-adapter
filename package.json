@@ -41,7 +41,7 @@
   "dependencies": {
     "reflect-metadata": "^0.1.13",
     "sequelize": "6.29.3",
-    "sequelize-typescript": "2.1.5"
+    "sequelize-typescript": "2.1.6"
   },
   "files": [
     "lib",

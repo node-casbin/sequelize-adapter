@@ -30,12 +30,11 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql database: casbin
-          mysql root password: password
 
       - name: Set up Node.js
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: ^20
+          node-version: 20
 
       - name: Install Dependency
         run: yarn install
@@ -54,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [^18, ^20]
+        node: ['18', '20']
     steps:
       - uses: actions/checkout@v2
 
@@ -62,7 +61,6 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql database: casbin
-          mysql root password: password
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -84,7 +82,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ^20
+          node-version: 20
 
       - name: Run semantic-release
         if: github.repository == 'node-casbin/sequelize-adapter' && github.event_name == 'push'

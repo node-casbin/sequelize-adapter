@@ -83,8 +83,8 @@ async function myFunction() {
 
   // Load the filtered policy from DB.
   await e.loadFilteredPolicy({
-    'ptype': 'p',
-    'v0': 'alice'
+    ptype: 'p',
+    v0: 'alice'
   });
 
   // Check the permission.

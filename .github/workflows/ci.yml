@@ -5,6 +5,8 @@ on: [push, pull_request]
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v2
 
@@ -23,6 +25,8 @@ jobs:
   coverage:
     needs: [lint]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v2
 
@@ -51,6 +55,8 @@ jobs:
   test:
     needs: [lint]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         node: ['18', '20']
@@ -76,6 +82,8 @@ jobs:
   semantic-release:
     needs: [lint, test, coverage]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v2
 

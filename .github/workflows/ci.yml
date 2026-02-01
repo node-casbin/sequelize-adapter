@@ -34,7 +34,6 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql database: casbin
-          mysql root password: password
 
       - name: Set up Node.js
         uses: actions/setup-node@v2.1.5
@@ -65,7 +64,6 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql database: casbin
-          mysql root password: password
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
